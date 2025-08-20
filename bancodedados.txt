@@ -1,0 +1,88 @@
+model Nutritionist {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  role      String    @default("nutritionist")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  patients  Patient[]
+  appointments Appointment[]
+}
+
+
+model Patient {
+  id             String       @id @default(uuid())
+  nutritionist   Nutritionist @relation(fields: [nutritionistId], references: [id])
+  nutritionistId String
+  fullName       String
+  email          String?      @unique
+  phone          String?
+  birthDate      DateTime?
+  sex            String?
+  weight         Float?
+  height         Float?
+  goal           String?
+  allergies      String[]     @default([])
+  notes          String?
+  measurements   Measurement[]
+  plans          Plan[]
+  files          File[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Appointment {
+  id             String   @id @default(uuid())
+  nutritionist   Nutritionist @relation(fields: [nutritionistId], references: [id])
+  nutritionistId String
+  patient        Patient  @relation(fields: [patientId], references: [id])
+  patientId      String
+  startAt        DateTime
+  endAt          DateTime
+  status         String   @default("scheduled") // scheduled, canceled, done
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Measurement {
+  id        String   @id @default(uuid())
+  patient   Patient  @relation(fields: [patientId], references: [id])
+  patientId String
+  date      DateTime
+  weight    Float?
+  waist     Float?
+  hip       Float?
+  bodyFat   Float?
+  createdAt DateTime @default(now())
+}
+
+model Plan {
+  id             String   @id @default(uuid())
+  patient        Patient  @relation(fields: [patientId], references: [id])
+  patientId      String
+  nutritionist   Nutritionist @relation(fields: [nutritionistId], references: [id])
+  nutritionistId String
+  name           String
+  description    String?
+  meals          Json
+  totalCalories  Int?
+  macros         Json
+  aiGenerated    Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model File {
+  id        String   @id @default(uuid())
+  patient   Patient? @relation(fields: [patientId], references: [id])
+  patientId String?
+  nutritionist Nutritionist? @relation(fields: [nutritionistId], references: [id])
+  nutritionistId String?
+  filename  String
+  url       String
+  mime      String
+  size      Int
+  uploadedAt DateTime @default(now())
+}

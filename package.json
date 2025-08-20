@@ -1,0 +1,45 @@
+{
+  "name": "nutrigpt-api",
+  "version": "1.0.0",
+  "description": "NutriGPT REST API (CRM para nutricionistas) - Node.js + Express + Sequelize + MySQL",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "db:migrate": "sequelize-cli --config sequelize.config.js db:migrate",
+    "db:migrate:undo": "sequelize-cli --config sequelize.config.js db:migrate:undo",
+    "db:migrate:undo:all": "sequelize-cli --config sequelize.config.js db:migrate:undo:all",
+    "db:create": "sequelize-cli --config sequelize.config.js db:create"
+  },
+  "keywords": [
+    "express",
+    "sequelize",
+    "mysql",
+    "jwt",
+    "zod",
+    "crm",
+    "nutrition"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.11.0",
+    "sequelize": "^6.37.3",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "sequelize-cli": "^6.6.2"
+  }
+}
+
