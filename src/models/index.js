@@ -49,6 +49,7 @@ const defineModels = () => {
     waist: { type: DataTypes.FLOAT, allowNull: true },
     hip: { type: DataTypes.FLOAT, allowNull: true },
     bodyFat: { type: DataTypes.FLOAT, allowNull: true },
+    notes: { type: DataTypes.TEXT, allowNull: true },
   }, {
     tableName: 'Measurement',
     timestamps: true,
@@ -59,6 +60,7 @@ const defineModels = () => {
   const Plan = sequelize.define('Plan', {
     id: { type: DataTypes.STRING, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
     patientId: { type: DataTypes.STRING, allowNull: false },
+    appointmentId: { type: DataTypes.STRING, allowNull: true },
     nutritionistId: { type: DataTypes.STRING, allowNull: false },
     name: { type: DataTypes.STRING, allowNull: false },
     description: { type: DataTypes.TEXT, allowNull: true },

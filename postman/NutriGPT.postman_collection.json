@@ -1,0 +1,564 @@
+{
+  "info": {
+    "name": "NutriGPT API",
+    "description": "Coleção Postman para testar os endpoints da API NutriGPT.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api" },
+    { "key": "accessToken", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "patientId", "value": "" },
+    { "key": "appointmentId", "value": "" },
+    { "key": "planId", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{accessToken}}", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "Misc",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dra. Teste\",\n  \"email\": \"dra.teste@example.com\",\n  \"password\": \"SenhaForte123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","register"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.tokens) {",
+                  "    pm.collectionVariables.set('accessToken', json.tokens.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', json.tokens.refreshToken);",
+                  "  }",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dra.teste@example.com\",\n  \"password\": \"SenhaForte123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.tokens) {",
+                  "    pm.collectionVariables.set('accessToken', json.tokens.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', json.tokens.refreshToken);",
+                  "  }",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","refresh"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.tokens) {",
+                  "    pm.collectionVariables.set('accessToken', json.tokens.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', json.tokens.refreshToken);",
+                  "  }",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["me"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Patients",
+      "item": [
+        {
+          "name": "Create patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Paciente Exemplo\",\n  \"email\": \"paciente@example.com\",\n  \"weight\": 80,\n  \"height\": 175,\n  \"goal\": \"Perder peso\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.patient && json.patient.id) {",
+                  "    pm.collectionVariables.set('patientId', json.patient.id);",
+                  "  }",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List patients",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients?name=&goal=&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients"],
+              "query": [
+                {"key": "name", "value": ""},
+                {"key": "goal", "value": ""},
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "20"}
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.data && json.data.length) {",
+                  "    pm.collectionVariables.set('patientId', json.data[0].id);",
+                  "  }",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update patient",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goal\": \"Definir massa magra\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients","{{patientId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete patient",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients","{{patientId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Appointments",
+      "item": [
+        {
+          "name": "Create appointment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"startAt\": \"2025-08-21T14:00:00.000Z\",\n  \"endAt\": \"2025-08-21T14:30:00.000Z\",\n  \"notes\": \"Consulta inicial\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments",
+              "host": ["{{baseUrl}}"],
+              "path": ["appointments"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.appointment && json.appointment.id) {",
+                  "    pm.collectionVariables.set('appointmentId', json.appointment.id);",
+                  "  }",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List appointments (day)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/appointments?range=day&date=2025-08-21",
+              "host": ["{{baseUrl}}"],
+              "path": ["appointments"],
+              "query": [
+                {"key": "range", "value": "day"},
+                {"key": "date", "value": "2025-08-21"}
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.data && json.data.length) {",
+                  "    pm.collectionVariables.set('appointmentId', json.data[0].id);",
+                  "  }",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List appointments (week)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/appointments?range=week&date=2025-08-21",
+              "host": ["{{baseUrl}}"],
+              "path": ["appointments"],
+              "query": [
+                {"key": "range", "value": "week"},
+                {"key": "date", "value": "2025-08-21"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "List appointments (month)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/appointments?range=month&date=2025-08-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["appointments"],
+              "query": [
+                {"key": "range", "value": "month"},
+                {"key": "date", "value": "2025-08-01"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update/reschedule appointment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startAt\": \"2025-08-21T15:00:00.000Z\",\n  \"endAt\": \"2025-08-21T15:30:00.000Z\",\n  \"notes\": \"Remarcada\",\n  \"status\": \"scheduled\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments/{{appointmentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["appointments","{{appointmentId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancel appointment",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/appointments/{{appointmentId}}/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["appointments","{{appointmentId}}","cancel"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Plans",
+      "item": [
+        {
+          "name": "AI Suggestion (preview)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"appointmentId\": \"{{appointmentId}}\",\n  \"name\": \"Plano Alimentar - Semana 1\",\n  \"preferences\": { \"notes\": \"Preferência por frango e peixe. Evitar lactose.\" }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/planos/ia/sugestao",
+              "host": ["{{baseUrl}}"],
+              "path": ["planos","ia","sugestao"]
+            }
+          }
+        },
+        {
+          "name": "Create plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"appointmentId\": \"{{appointmentId}}\",\n  \"name\": \"Plano Alimentar - Semana 1\",\n  \"description\": \"Plano gerado e revisado.\",\n  \"meals\": [\n    {\n      \"time\": \"08:00\",\n      \"title\": \"Café da manhã\",\n      \"items\": [\"Aveia 60g\", \"Iogurte natural 200ml\"],\n      \"calories\": 450,\n      \"macros\": {\"protein\": 20, \"carbs\": 65, \"fats\": 12}\n    }\n  ],\n  \"totalCalories\": 2000,\n  \"macros\": {\"protein\": 120, \"carbs\": 230, \"fats\": 60},\n  \"aiGenerated\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/planos",
+              "host": ["{{baseUrl}}"],
+              "path": ["planos"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": [
+                "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                "try { const json = pm.response.json(); if (json && json.data && json.data.plan) { pm.collectionVariables.set('planId', json.data.plan.id); } } catch (e) {}"
+              ]}
+            }
+          ]
+        },
+        {
+          "name": "Get plan",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/planos/{{planId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["planos","{{planId}}"]
+            }
+          }
+        },
+        {
+          "name": "List plans by patient",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pacientes/{{patientId}}/planos",
+              "host": ["{{baseUrl}}"],
+              "path": ["pacientes","{{patientId}}","planos"]
+            }
+          }
+        },
+        {
+          "name": "Update plan",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Plano Alimentar - Semana 1 (Atualizado)\",\n  \"description\": \"Notas atualizadas\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/planos/{{planId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["planos","{{planId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete plan",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/planos/{{planId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["planos","{{planId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+
+
