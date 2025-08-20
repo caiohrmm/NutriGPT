@@ -72,13 +72,9 @@
               "script": {
                 "exec": [
                   "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
-                  "try {",
-                  "  const json = pm.response.json();",
-                  "  if (json && json.tokens) {",
-                  "    pm.collectionVariables.set('accessToken', json.tokens.accessToken);",
-                  "    pm.collectionVariables.set('refreshToken', json.tokens.refreshToken);",
-                  "  }",
-                  "} catch (e) {}"
+                  "const hdr = pm.response.headers.get('x-access-token');",
+                  "if (hdr) pm.collectionVariables.set('accessToken', hdr);",
+                  "try { const json = pm.response.json(); if (json && json.tokens) { pm.collectionVariables.set('accessToken', json.tokens.accessToken); pm.collectionVariables.set('refreshToken', json.tokens.refreshToken); } } catch (e) {}"
                 ]
               }
             }
@@ -107,13 +103,9 @@
               "script": {
                 "exec": [
                   "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
-                  "try {",
-                  "  const json = pm.response.json();",
-                  "  if (json && json.tokens) {",
-                  "    pm.collectionVariables.set('accessToken', json.tokens.accessToken);",
-                  "    pm.collectionVariables.set('refreshToken', json.tokens.refreshToken);",
-                  "  }",
-                  "} catch (e) {}"
+                  "const hdr = pm.response.headers.get('x-access-token');",
+                  "if (hdr) pm.collectionVariables.set('accessToken', hdr);",
+                  "try { const json = pm.response.json(); if (json && json.tokens) { pm.collectionVariables.set('accessToken', json.tokens.accessToken); pm.collectionVariables.set('refreshToken', json.tokens.refreshToken); } } catch (e) {}"
                 ]
               }
             }
@@ -123,13 +115,7 @@
           "name": "Refresh",
           "request": {
             "method": "POST",
-            "header": [
-              {"key": "Content-Type", "value": "application/json"}
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
-            },
+            "header": [],
             "url": {
               "raw": "{{baseUrl}}/auth/refresh",
               "host": ["{{baseUrl}}"],
@@ -142,13 +128,33 @@
               "script": {
                 "exec": [
                   "pm.test('Status 200', function () { pm.response.to.have.status(200); });",
-                  "try {",
-                  "  const json = pm.response.json();",
-                  "  if (json && json.tokens) {",
-                  "    pm.collectionVariables.set('accessToken', json.tokens.accessToken);",
-                  "    pm.collectionVariables.set('refreshToken', json.tokens.refreshToken);",
-                  "  }",
-                  "} catch (e) {}"
+                  "const hdr = pm.response.headers.get('x-access-token');",
+                  "if (hdr) pm.collectionVariables.set('accessToken', hdr);",
+                  "try { const json = pm.response.json(); if (json && json.tokens) { pm.collectionVariables.set('accessToken', json.tokens.accessToken); pm.collectionVariables.set('refreshToken', json.tokens.refreshToken); } } catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth","logout"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204', function () { pm.response.to.have.status(204); });",
+                  "pm.collectionVariables.set('accessToken', '');",
+                  "pm.collectionVariables.set('refreshToken', '');"
                 ]
               }
             }

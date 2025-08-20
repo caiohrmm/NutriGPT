@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const { z } = require('zod');
 const { signTokens, verifyRefresh } = require('../utils/jwt');
+const { setAuthTokens, clearAuth } = require('../utils/authHelpers');
 const { hashPassword, verifyPassword } = require('../utils/password');
 const crypto = require('crypto');
 const { sequelize } = require('../sequelize');
@@ -39,6 +40,7 @@ router.post('/auth/register', async (req, res) => {
     const id = crypto.randomUUID();
     const user = await Nutritionist.create({ id, name, email, password: hash, role: 'nutritionist' });
     const { accessToken, refreshToken } = signTokens({ sub: user.id, role: user.role });
+    setAuthTokens(res, { accessToken, refreshToken });
     return res.status(201).json({
       user: { id: user.id, name: user.name, email: user.email, role: user.role },
       tokens: { accessToken, refreshToken },
@@ -57,6 +59,7 @@ router.post('/auth/login', async (req, res) => {
     const ok = await verifyPassword(password, user.password);
     if (!ok) return res.status(401).json({ message: 'Credenciais inválidas' });
     const { accessToken, refreshToken } = signTokens({ sub: user.id, role: user.role });
+    setAuthTokens(res, { accessToken, refreshToken });
     return res.json({
       user: { id: user.id, name: user.name, email: user.email, role: user.role },
       tokens: { accessToken, refreshToken },
@@ -69,14 +72,22 @@ router.post('/auth/login', async (req, res) => {
 
 router.post('/auth/refresh', async (req, res) => {
   try {
-    const { refreshToken } = req.body || {};
-    if (!refreshToken) return res.status(400).json({ message: 'refreshToken é obrigatório' });
-    const payload = verifyRefresh(refreshToken);
+    const bodyRt = req.body && req.body.refreshToken;
+    const cookieRt = req.cookies && (req.cookies.refreshToken || req.cookies.rt);
+    const rt = bodyRt || cookieRt;
+    if (!rt) return res.status(400).json({ message: 'refreshToken é obrigatório' });
+    const payload = verifyRefresh(rt);
     const { accessToken, refreshToken: nextRefresh } = signTokens({ sub: payload.sub, role: payload.role });
+    setAuthTokens(res, { accessToken, refreshToken: nextRefresh });
     return res.json({ tokens: { accessToken, refreshToken: nextRefresh } });
   } catch (err) {
     return res.status(401).json({ message: 'Refresh token inválido' });
   }
+});
+
+router.post('/auth/logout', async (_req, res) => {
+  clearAuth(res);
+  return res.status(204).send();
 });
 
 router.get('/me', auth(true), async (req, res) => {
