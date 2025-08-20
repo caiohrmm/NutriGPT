@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
+const { requestLogger } = require('./middleware/requestLogger');
 
 dotenv.config();
 
@@ -10,6 +11,7 @@ const app = express();
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
+app.use(requestLogger());
 app.use(helmet());
 app.use(cors({
   origin: (origin, cb) => {
@@ -27,6 +29,8 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.get('/health', (_req, res) => res.json({ ok: true, env: process.env.NODE_ENV || 'development' }));
+// Alias para coleção Postman que usa baseUrl com /api
+app.get('/api/health', (_req, res) => res.json({ ok: true, env: process.env.NODE_ENV || 'development' }));
 
 // Routes
 const routes = require('./routes');
