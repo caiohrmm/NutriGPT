@@ -2,7 +2,7 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Appointment', {
-      id: { type: Sequelize.STRING(36), primaryKey: true, allowNull: false, defaultValue: Sequelize.literal('UUID()') },
+      id: { type: Sequelize.STRING(36), primaryKey: true, allowNull: false },
       nutritionistId: {
         type: Sequelize.STRING(36),
         allowNull: false,

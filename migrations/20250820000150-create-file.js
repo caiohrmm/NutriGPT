@@ -2,7 +2,7 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('File', {
-      id: { type: Sequelize.STRING(36), primaryKey: true, allowNull: false, defaultValue: Sequelize.literal('UUID()') },
+      id: { type: Sequelize.STRING(36), primaryKey: true, allowNull: false },
       patientId: {
         type: Sequelize.STRING(36),
         allowNull: true,
