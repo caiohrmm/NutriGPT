@@ -466,12 +466,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"appointmentId\": \"{{appointmentId}}\",\n  \"name\": \"Plano Alimentar - Semana 1\",\n  \"preferences\": { \"notes\": \"Preferência por frango e peixe. Evitar lactose.\" }\n}"
+              "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"appointmentId\": \"{{appointmentId}}\",\n  \"name\": \"Meal Plan - Week 1\",\n  \"preferences\": { \"notes\": \"Prefers chicken and fish. Avoid lactose.\" }\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/planos/ia/sugestao",
+              "raw": "{{baseUrl}}/plans/ai/suggestion",
               "host": ["{{baseUrl}}"],
-              "path": ["planos","ia","sugestao"]
+              "path": ["plans","ai","suggestion"]
             }
           }
         },
@@ -484,12 +484,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"appointmentId\": \"{{appointmentId}}\",\n  \"name\": \"Plano Alimentar - Semana 1\",\n  \"description\": \"Plano gerado e revisado.\",\n  \"meals\": [\n    {\n      \"time\": \"08:00\",\n      \"title\": \"Café da manhã\",\n      \"items\": [\"Aveia 60g\", \"Iogurte natural 200ml\"],\n      \"calories\": 450,\n      \"macros\": {\"protein\": 20, \"carbs\": 65, \"fats\": 12}\n    }\n  ],\n  \"totalCalories\": 2000,\n  \"macros\": {\"protein\": 120, \"carbs\": 230, \"fats\": 60},\n  \"aiGenerated\": true\n}"
+              "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"appointmentId\": \"{{appointmentId}}\",\n  \"name\": \"Meal Plan - Week 1\",\n  \"description\": \"Generated and reviewed\",\n  \"meals\": [\n    {\n      \"time\": \"08:00\",\n      \"title\": \"Breakfast\",\n      \"items\": [\"Oats 60g\", \"Yogurt 200ml\"],\n      \"calories\": 450,\n      \"macros\": {\"protein\": 20, \"carbs\": 65, \"fats\": 12}\n    }\n  ],\n  \"totalCalories\": 2000,\n  \"macros\": {\"protein\": 120, \"carbs\": 230, \"fats\": 60},\n  \"aiGenerated\": true\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/planos",
+              "raw": "{{baseUrl}}/plans",
               "host": ["{{baseUrl}}"],
-              "path": ["planos"]
+              "path": ["plans"]
             }
           },
           "event": [
@@ -508,9 +508,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/planos/{{planId}}",
+              "raw": "{{baseUrl}}/plans/{{planId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["planos","{{planId}}"]
+              "path": ["plans","{{planId}}"]
             }
           }
         },
@@ -520,9 +520,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/pacientes/{{patientId}}/planos",
+              "raw": "{{baseUrl}}/patients/{{patientId}}/plans",
               "host": ["{{baseUrl}}"],
-              "path": ["pacientes","{{patientId}}","planos"]
+              "path": ["patients","{{patientId}}","plans"]
             }
           }
         },
@@ -535,12 +535,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Plano Alimentar - Semana 1 (Atualizado)\",\n  \"description\": \"Notas atualizadas\"\n}"
+              "raw": "{\n  \"name\": \"Meal Plan - Week 1 (Updated)\",\n  \"description\": \"Updated notes\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/planos/{{planId}}",
+              "raw": "{{baseUrl}}/plans/{{planId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["planos","{{planId}}"]
+              "path": ["plans","{{planId}}"]
             }
           }
         },
@@ -550,9 +550,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/planos/{{planId}}",
+              "raw": "{{baseUrl}}/plans/{{planId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["planos","{{planId}}"]
+              "path": ["plans","{{planId}}"]
             }
           }
         }

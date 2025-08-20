@@ -93,7 +93,7 @@ async function ensureOwnership(req, patientId, appointmentId) {
 }
 
 // IA: gerar sugestão base (preview, sem salvar)
-router.post('/planos/ia/sugestao', auth(true), async (req, res) => {
+router.post('/plans/ai/suggestion', auth(true), async (req, res) => {
   try {
     const payload = aiInputSchema.parse(req.body);
     const own = await ensureOwnership(req, payload.patientId, payload.appointmentId);
@@ -108,7 +108,7 @@ router.post('/planos/ia/sugestao', auth(true), async (req, res) => {
 });
 
 // Criar plano (manual ou via IA já editada)
-router.post('/planos', auth(true), async (req, res) => {
+router.post('/plans', auth(true), async (req, res) => {
   try {
     const body = planBodySchema.parse(req.body);
     const own = await ensureOwnership(req, body.patientId, body.appointmentId);
@@ -133,7 +133,7 @@ router.post('/planos', auth(true), async (req, res) => {
 });
 
 // Detalhar plano
-router.get('/planos/:id', auth(true), async (req, res) => {
+router.get('/plans/:id', auth(true), async (req, res) => {
   try {
     const id = req.params.id;
     const plan = await Plan.findByPk(id);
@@ -147,7 +147,7 @@ router.get('/planos/:id', auth(true), async (req, res) => {
 });
 
 // Listar planos de um paciente
-router.get('/pacientes/:id/planos', auth(true), async (req, res) => {
+router.get('/patients/:id/plans', auth(true), async (req, res) => {
   try {
     const patientId = req.params.id;
     const own = await ensureOwnership(req, patientId);
@@ -162,7 +162,7 @@ router.get('/pacientes/:id/planos', auth(true), async (req, res) => {
 
 // Atualizar plano
 const updateSchema = planBodySchema.partial().extend({ patientId: z.string().min(1).optional() });
-router.put('/planos/:id', auth(true), async (req, res) => {
+router.put('/plans/:id', auth(true), async (req, res) => {
   try {
     const id = req.params.id;
     const body = updateSchema.parse(req.body);
@@ -193,7 +193,7 @@ router.put('/planos/:id', auth(true), async (req, res) => {
 });
 
 // Excluir plano
-router.delete('/planos/:id', auth(true), async (req, res) => {
+router.delete('/plans/:id', auth(true), async (req, res) => {
   try {
     const id = req.params.id;
     const plan = await Plan.findByPk(id);
