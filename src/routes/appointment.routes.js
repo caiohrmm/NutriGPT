@@ -6,7 +6,7 @@ const { DataTypes, Op } = require('sequelize');
 
 // Lightweight models to avoid cyclic imports
 const Appointment = sequelize.define('Appointment', {
-  id: { type: DataTypes.STRING, primaryKey: true },
+  id: { type: DataTypes.STRING, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
   nutritionistId: { type: DataTypes.STRING, allowNull: false },
   patientId: { type: DataTypes.STRING, allowNull: false },
   startAt: { type: DataTypes.DATE, allowNull: false },
@@ -16,7 +16,7 @@ const Appointment = sequelize.define('Appointment', {
 }, { tableName: 'Appointment' });
 
 const Patient = sequelize.define('Patient', {
-  id: { type: DataTypes.STRING, primaryKey: true },
+  id: { type: DataTypes.STRING, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
   nutritionistId: { type: DataTypes.STRING, allowNull: false },
   fullName: { type: DataTypes.STRING, allowNull: false },
 }, { tableName: 'Patient' });

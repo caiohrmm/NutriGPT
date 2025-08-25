@@ -7,7 +7,7 @@ const { generatePlanSuggestion } = require('../utils/ai');
 
 // Lightweight models
 const Plan = sequelize.define('Plan', {
-  id: { type: DataTypes.STRING, primaryKey: true },
+  id: { type: DataTypes.STRING, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
   patientId: { type: DataTypes.STRING, allowNull: false },
   appointmentId: { type: DataTypes.STRING, allowNull: true },
   nutritionistId: { type: DataTypes.STRING, allowNull: false },
@@ -20,7 +20,7 @@ const Plan = sequelize.define('Plan', {
 }, { tableName: 'Plan' });
 
 const Patient = sequelize.define('Patient', {
-  id: { type: DataTypes.STRING, primaryKey: true },
+  id: { type: DataTypes.STRING, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
   nutritionistId: { type: DataTypes.STRING, allowNull: false },
   fullName: { type: DataTypes.STRING, allowNull: false },
   birthDate: { type: DataTypes.DATE, allowNull: true },
@@ -32,7 +32,7 @@ const Patient = sequelize.define('Patient', {
 }, { tableName: 'Patient' });
 
 const Appointment = sequelize.define('Appointment', {
-  id: { type: DataTypes.STRING, primaryKey: true },
+  id: { type: DataTypes.STRING, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
   nutritionistId: { type: DataTypes.STRING, allowNull: false },
   patientId: { type: DataTypes.STRING, allowNull: false },
   startAt: { type: DataTypes.DATE, allowNull: false },

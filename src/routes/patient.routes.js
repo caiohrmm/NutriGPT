@@ -7,7 +7,7 @@ const { logger } = require('../utils/logger');
 
 // Lightweight model to avoid import cycles
 const Patient = sequelize.define('Patient', {
-  id: { type: DataTypes.STRING, primaryKey: true },
+  id: { type: DataTypes.STRING, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
   nutritionistId: { type: DataTypes.STRING, allowNull: false },
   fullName: { type: DataTypes.STRING, allowNull: false },
   email: { type: DataTypes.STRING, allowNull: true, unique: true },

@@ -6,7 +6,7 @@ const { DataTypes, Op } = require('sequelize');
 
 // Lightweight models
 const Measurement = sequelize.define('Measurement', {
-  id: { type: DataTypes.STRING, primaryKey: true },
+  id: { type: DataTypes.STRING, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
   patientId: { type: DataTypes.STRING, allowNull: false },
   date: { type: DataTypes.DATE, allowNull: false },
   weight: { type: DataTypes.FLOAT, allowNull: true },
@@ -17,7 +17,7 @@ const Measurement = sequelize.define('Measurement', {
 }, { tableName: 'Measurement', timestamps: true, createdAt: 'createdAt', updatedAt: false });
 
 const Patient = sequelize.define('Patient', {
-  id: { type: DataTypes.STRING, primaryKey: true },
+  id: { type: DataTypes.STRING, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
   nutritionistId: { type: DataTypes.STRING, allowNull: false },
 }, { tableName: 'Patient' });
 
