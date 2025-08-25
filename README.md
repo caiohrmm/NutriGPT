@@ -1,6 +1,6 @@
-# 🥗 Nutricare CRM
+# 🥗 NutriGPT CRM
 
-  **Nutricare** é um sistema **CRM especializado para nutricionistas**, desenvolvido para simplificar e automatizar a gestão de pacientes, consultas e planos alimentares. O sistema combina funcionalidades de controle clínico com recursos de **Inteligência Artificial** para auxiliar o nutricionista na criação de planos personalizados, relatórios e no acompanhamento da evolução dos pacientes.
+  **NutriGPT** é um sistema **CRM especializado para nutricionistas**, desenvolvido para simplificar e automatizar a gestão de pacientes, consultas e planos alimentares. O sistema combina funcionalidades de controle clínico com recursos de **Inteligência Artificial** para auxiliar o nutricionista na criação de planos personalizados, relatórios e no acompanhamento da evolução dos pacientes.
 
   ---
 
