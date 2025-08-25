@@ -196,7 +196,41 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Paciente Exemplo\",\n  \"email\": \"paciente@example.com\",\n  \"weight\": 80,\n  \"height\": 175,\n  \"goal\": \"Perder peso\"\n}"
+              "raw": "{\n  \"fullName\": \"Paciente Exemplo {{$timestamp}}\",\n  \"email\": \"paciente+{{$timestamp}}@example.com\",\n  \"weight\": 80,\n  \"height\": 175,\n  \"goal\": \"Perder peso\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201', function () { pm.response.to.have.status(201); });",
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.patient && json.patient.id) {",
+                  "    pm.collectionVariables.set('patientId', json.patient.id);",
+                  "  }",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create patient (minimal)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Paciente {{$timestamp}}\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/patients",

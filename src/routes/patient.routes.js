@@ -3,6 +3,7 @@ const { z } = require('zod');
 const { auth } = require('../middleware/auth');
 const { sequelize } = require('../sequelize');
 const { DataTypes, Op } = require('sequelize');
+const { logger } = require('../utils/logger');
 
 // Lightweight model to avoid import cycles
 const Patient = sequelize.define('Patient', {
@@ -23,11 +24,11 @@ const Patient = sequelize.define('Patient', {
 const router = Router();
 
 const createPatientSchema = z.object({
-  fullName: z.string().min(2, 'Nome inválido'),
-  email: z.string().email().optional().nullable(),
-  weight: z.coerce.number().positive().max(1000).optional(),
-  height: z.coerce.number().positive().max(300).optional(),
-  goal: z.string().max(255).optional(),
+  fullName: z.string({ required_error: 'fullName é obrigatório' }).min(2, 'fullName deve ter ao menos 2 caracteres'),
+  email: z.string().email('email inválido').optional().nullable(),
+  weight: z.coerce.number().positive('weight deve ser > 0').max(1000, 'weight muito alto').optional(),
+  height: z.coerce.number().positive('height deve ser > 0').max(300, 'height muito alto').optional(),
+  goal: z.string().max(255, 'goal muito longo').optional(),
 });
 
 const updatePatientSchema = createPatientSchema.partial();
@@ -49,7 +50,14 @@ router.post('/patients', auth(true), async (req, res) => {
     });
     return res.status(201).json({ patient: created });
   } catch (err) {
-    if (err instanceof z.ZodError) return res.status(400).json({ message: 'Dados inválidos', issues: err.issues });
+    if (err instanceof z.ZodError) {
+      const details = err.issues.map((i) => ({ field: i.path.join('.'), message: i.message, code: i.code }));
+      return res.status(400).json({ message: 'Dados inválidos', details });
+    }
+    if (err && err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).json({ message: 'Violação de unicidade', details: err.errors?.map((e) => ({ field: e.path, message: e.message })) || [] });
+    }
+    logger?.error({ err }, 'patients.create.error');
     return res.status(500).json({ message: 'Erro ao cadastrar paciente' });
   }
 });
@@ -105,7 +113,14 @@ router.put('/patients/:id', auth(true), async (req, res) => {
     await patient.update(payload);
     return res.json({ patient });
   } catch (err) {
-    if (err instanceof z.ZodError) return res.status(400).json({ message: 'Dados inválidos', issues: err.issues });
+    if (err instanceof z.ZodError) {
+      const details = err.issues.map((i) => ({ field: i.path.join('.'), message: i.message, code: i.code }));
+      return res.status(400).json({ message: 'Dados inválidos', details });
+    }
+    if (err && err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).json({ message: 'Violação de unicidade', details: err.errors?.map((e) => ({ field: e.path, message: e.message })) || [] });
+    }
+    logger?.error({ err }, 'patients.update.error');
     return res.status(500).json({ message: 'Erro ao atualizar paciente' });
   }
 });
