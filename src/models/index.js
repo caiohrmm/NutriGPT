@@ -46,6 +46,13 @@ const defineModels = () => {
     patientId: { type: DataTypes.STRING, allowNull: false },
     date: { type: DataTypes.DATE, allowNull: false },
     weight: { type: DataTypes.FLOAT, allowNull: true },
+    heightCm: { type: DataTypes.FLOAT, allowNull: true },
+    bmi: { type: DataTypes.FLOAT, allowNull: true },
+    bodyFatPercentage: { type: DataTypes.FLOAT, allowNull: true },
+    waistCircumference: { type: DataTypes.FLOAT, allowNull: true },
+    hipCircumference: { type: DataTypes.FLOAT, allowNull: true },
+    armCircumference: { type: DataTypes.FLOAT, allowNull: true },
+    // legacy fields retained for compatibility
     waist: { type: DataTypes.FLOAT, allowNull: true },
     hip: { type: DataTypes.FLOAT, allowNull: true },
     bodyFat: { type: DataTypes.FLOAT, allowNull: true },
@@ -53,8 +60,6 @@ const defineModels = () => {
   }, {
     tableName: 'Measurement',
     timestamps: true,
-    createdAt: 'createdAt',
-    updatedAt: false,
   });
 
   const Plan = sequelize.define('Plan', {
