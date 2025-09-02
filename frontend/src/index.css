@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 142.1 70.6% 45.3%;
+  --primary-foreground: 355.7 100% 97.3%;
+  --secondary: 142.1 76.2% 96.3%;
+  --secondary-foreground: 142.1 76.2% 15.3%;
+  --muted: 210 40% 98%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 142.1 76.2% 96.3%;
+  --accent-foreground: 142.1 76.2% 15.3%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 142.1 70.6% 45.3%;
+  --radius: 0.5rem;
+  
+  /* NutriGPT Custom Variables */
+  --nutrigpt-green-50: 142.1 76.2% 96.3%;
+  --nutrigpt-green-100: 142.1 76.2% 91.3%;
+  --nutrigpt-green-200: 142.1 76.2% 81.3%;
+  --nutrigpt-green-500: 142.1 70.6% 45.3%;
+  --nutrigpt-green-600: 142.1 70.6% 35.3%;
+  --nutrigpt-green-700: 142.1 70.6% 25.3%;
+  --nutrigpt-sidebar: 142.1 76.2% 96.3%;
+  --nutrigpt-sidebar-active: 142.1 70.6% 45.3%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
