@@ -21,6 +21,10 @@ const Patient = sequelize.define('Patient', {
   fullName: { type: DataTypes.STRING, allowNull: false },
 }, { tableName: 'Patient' });
 
+// Associations
+Appointment.belongsTo(Patient, { foreignKey: 'patientId' });
+Patient.hasMany(Appointment, { foreignKey: 'patientId' });
+
 const router = Router();
 
 const allowedStatuses = ['scheduled', 'done', 'canceled'];
@@ -99,36 +103,73 @@ router.post('/appointments', auth(true), async (req, res) => {
   }
 });
 
-// List appointments by day/week/month
+// List appointments with pagination and search
 router.get('/appointments', auth(true), async (req, res) => {
   try {
-    const rangeKind = (req.query.range || 'day').toString();
-    if (!['day', 'week', 'month'].includes(rangeKind)) {
-      return res.status(400).json({ message: 'Parâmetro range inválido (use day|week|month)' });
-    }
-
-    const dateParam = req.query.date ? new Date(req.query.date) : new Date();
-    const range = getRange(dateParam, rangeKind);
-    if (!range) return res.status(400).json({ message: 'Data inválida' });
-
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    
     const where = {
       nutritionistId: req.user.id,
-      [Op.and]: [
-        // overlap between [startAt, endAt) and [range.start, range.end)
-        { startAt: { [Op.lt]: range.end } },
-        { endAt: { [Op.gt]: range.start } },
-      ],
       ...(req.query.patientId ? { patientId: req.query.patientId } : {}),
       ...(req.query.status && allowedStatuses.includes(req.query.status) ? { status: req.query.status } : {}),
     };
 
-    const items = await Appointment.findAll({
+    // Handle date range filtering
+    if (req.query.range && req.query.date) {
+      const rangeKind = req.query.range.toString();
+      if (['day', 'week', 'month'].includes(rangeKind)) {
+        const dateParam = new Date(req.query.date);
+        const range = getRange(dateParam, rangeKind);
+        if (range) {
+          where[Op.and] = [
+            { startAt: { [Op.lt]: range.end } },
+            { endAt: { [Op.gt]: range.start } },
+          ];
+        }
+      }
+    }
+
+    const includeOptions = [];
+    
+    // Include Patient data for search by name
+    if (req.query.patient) {
+      includeOptions.push({
+        model: Patient,
+        where: {
+          fullName: { [Op.like]: `%${req.query.patient}%` }
+        },
+        required: true
+      });
+    } else {
+      includeOptions.push({
+        model: Patient,
+        required: false
+      });
+    }
+
+    const { count, rows } = await Appointment.findAndCountAll({
       where,
-      order: [['startAt', 'ASC']],
+      include: includeOptions,
+      order: [['startAt', 'DESC']],
+      limit,
+      offset,
     });
 
-    return res.json({ data: items, range });
+    const totalPages = Math.ceil(count / limit);
+
+    return res.json({ 
+      data: rows, 
+      meta: {
+        total: count,
+        page,
+        limit,
+        totalPages
+      }
+    });
   } catch (_err) {
+    console.error('Error listing appointments:', _err);
     return res.status(500).json({ message: 'Erro ao listar consultas' });
   }
 });

@@ -3,10 +3,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import { AuthProvider } from './context/AuthContext'
 import { PrivateRoute } from './components/PrivateRoute'
+import { ToastProvider } from './components/ui/toast'
+import { ConfirmationProvider } from './components/ui/confirmation-modal'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { PatientsPage } from './pages/PatientsPage'
+import { PatientDetailPage } from './pages/PatientDetailPage'
 import { AppointmentsPage } from './pages/AppointmentsPage'
 import { ProfilePage } from './pages/ProfilePage'
 
@@ -42,6 +45,14 @@ function AppContent() {
         }
       />
       <Route
+        path="/patients/:id"
+        element={
+          <PrivateRoute>
+            <PatientDetailPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
         path="/appointments"
         element={
           <PrivateRoute>
@@ -67,7 +78,11 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <AuthProvider>
-          <AppContent />
+          <ToastProvider>
+            <ConfirmationProvider>
+              <AppContent />
+            </ConfirmationProvider>
+          </ToastProvider>
         </AuthProvider>
       </Router>
     </QueryClientProvider>

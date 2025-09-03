@@ -26,9 +26,14 @@ const router = Router();
 const createPatientSchema = z.object({
   fullName: z.string({ required_error: 'fullName é obrigatório' }).min(2, 'fullName deve ter ao menos 2 caracteres'),
   email: z.string().email('email inválido').optional().nullable(),
+  phone: z.string().max(20, 'phone muito longo').optional().nullable(),
+  birthDate: z.string().optional().nullable(),
+  sex: z.enum(['M', 'F']).optional().nullable(),
   weight: z.coerce.number().positive('weight deve ser > 0').max(1000, 'weight muito alto').optional(),
   height: z.coerce.number().positive('height deve ser > 0').max(300, 'height muito alto').optional(),
   goal: z.string().max(255, 'goal muito longo').optional(),
+  allergies: z.string().max(1000, 'allergies muito longo').optional().nullable(),
+  notes: z.string().max(2000, 'notes muito longo').optional().nullable(),
 });
 
 const updatePatientSchema = createPatientSchema.partial();
@@ -44,9 +49,14 @@ router.post('/patients', auth(true), async (req, res) => {
       nutritionistId: req.user.id,
       fullName: payload.fullName,
       email: payload.email ?? null,
+      phone: payload.phone ?? null,
+      birthDate: payload.birthDate ? new Date(payload.birthDate) : null,
+      sex: payload.sex ?? null,
       weight: payload.weight ?? null,
       height: payload.height ?? null,
       goal: payload.goal ?? null,
+      allergies: payload.allergies ? payload.allergies.split(',').map(a => a.trim()).filter(a => a) : [],
+      notes: payload.notes ?? null,
     });
     return res.status(201).json({ patient: created });
   } catch (err) {
@@ -97,6 +107,24 @@ router.get('/patients', auth(true), async (req, res) => {
   }
 });
 
+router.get('/patients/:id', auth(true), async (req, res) => {
+  try {
+    const id = req.params.id;
+    const patient = await Patient.findOne({ 
+      where: { id, nutritionistId: req.user.id },
+      attributes: { exclude: ['nutritionistId'] }
+    });
+    
+    if (!patient) {
+      return res.status(404).json({ message: 'Paciente não encontrado' });
+    }
+    
+    return res.json({ patient });
+  } catch (_err) {
+    return res.status(500).json({ message: 'Erro ao carregar paciente' });
+  }
+});
+
 router.put('/patients/:id', auth(true), async (req, res) => {
   try {
     const id = req.params.id;
@@ -110,7 +138,13 @@ router.put('/patients/:id', auth(true), async (req, res) => {
       if (exists) return res.status(409).json({ message: 'Email de paciente já está em uso' });
     }
 
-    await patient.update(payload);
+    const updateData = {
+      ...payload,
+      birthDate: payload.birthDate ? new Date(payload.birthDate) : payload.birthDate,
+      allergies: payload.allergies ? payload.allergies.split(',').map(a => a.trim()).filter(a => a) : payload.allergies,
+    };
+    
+    await patient.update(updateData);
     return res.json({ patient });
   } catch (err) {
     if (err instanceof z.ZodError) {
