@@ -1,0 +1,72 @@
+flowchart TD
+    %% Frontend Components
+    Browser["🌐 Navegador Web"]
+    React["⚛️ React Frontend<br/>• Dashboard<br/>• Gestão de Pacientes<br/>• Consultas<br/>• Planos Alimentares"]
+    Router["🔀 React Router<br/>• Rotas Protegidas<br/>• Navegação SPA"]
+    
+    %% HTTP Layer
+    HTTP["📡 HTTP/HTTPS<br/>• Axios Client<br/>• CORS Headers<br/>• Rate Limiting"]
+    
+    %% Backend Components
+    Express["🚀 Express.js API<br/>• REST Endpoints<br/>• Middleware Chain<br/>• Error Handling"]
+    Auth["🔐 Autenticação<br/>• JWT Tokens<br/>• Password Hashing<br/>• Route Protection"]
+    Validation["✅ Validação<br/>• Zod Schemas<br/>• Input Sanitization<br/>• Business Rules"]
+    
+    %% Services
+    AIService["🤖 Serviço de IA<br/>• Google Gemini<br/>• Geração de Planos<br/>• Fallback Strategy"]
+    
+    %% Database
+    MySQL["🗄️ MySQL Database<br/>• 6 Tabelas Principais<br/>• Relacionamentos<br/>• Constraints"]
+    Sequelize["🔗 Sequelize ORM<br/>• Models & Migrations<br/>• Query Builder<br/>• Associations"]
+    
+    %% File System
+    FileSystem["💾 Sistema de Arquivos<br/>• Upload de Arquivos<br/>• Metadata Storage"]
+    
+    %% External Services
+    GoogleAI["🧠 Google Gemini API<br/>• AI Text Generation<br/>• Meal Plan Creation"]
+    
+    %% User Flow
+    Browser --> React
+    React --> Router
+    Router --> HTTP
+    
+    %% API Communication
+    HTTP --> Express
+    Express --> Auth
+    Auth --> Validation
+    Validation --> Sequelize
+    
+    %% External Integration
+    Express --> AIService
+    AIService --> GoogleAI
+    GoogleAI -.-> AIService
+    AIService -.-> Express
+    
+    %% Database Operations
+    Sequelize --> MySQL
+    MySQL --> Sequelize
+    
+    %% File Operations
+    Express --> FileSystem
+    FileSystem --> Express
+    
+    %% Response Flow
+    Sequelize -.-> Express
+    Express -.-> HTTP
+    HTTP -.-> React
+    React -.-> Browser
+    
+    %% Styling
+    classDef frontend fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef backend fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef database fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+    classDef external fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef security fill:#ffebee,stroke:#d32f2f,stroke-width:2px
+    classDef http fill:#e0f2f1,stroke:#00695c,stroke-width:2px
+    
+    class Browser,React,Router frontend
+    class Express,Validation,AIService backend
+    class MySQL,Sequelize,FileSystem database
+    class GoogleAI external
+    class Auth security
+    class HTTP http

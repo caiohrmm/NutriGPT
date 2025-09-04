@@ -1,0 +1,102 @@
+flowchart LR
+    %% Ator Principal
+    N[👨‍⚕️<br/>NUTRICIONISTA]
+    
+    %% Grupos de Funcionalidades
+    subgraph AUTH[🔐 AUTENTICAÇÃO]
+        L[Fazer Login]
+        R[Registrar-se]
+        P[Atualizar Perfil]
+        S[Alterar Senha]
+        O[Logout]
+    end
+    
+    subgraph PAT[👥 PACIENTES]
+        PC[Cadastrar Paciente]
+        PL[Listar Pacientes]
+        PV[Ver Detalhes]
+        PE[Editar Paciente]
+        PD[Excluir Paciente]
+        PF[Filtrar por Objetivo]
+    end
+    
+    subgraph CONS[📅 CONSULTAS]
+        CA[Agendar Consulta]
+        CL[Listar Consultas]
+        CR[Reagendar]
+        CC[Cancelar]
+        CF[Finalizar]
+        CD[Excluir]
+    end
+    
+    subgraph MED[📏 MEDIÇÕES]
+        MR[Registrar Medição]
+        MH[Ver Histórico]
+        ME[Editar Medição]
+        MD[Excluir Medição]
+        MI[Calcular IMC]
+        MG[Ver Gráficos]
+    end
+    
+    subgraph PLAN[🍽️ PLANOS]
+        PM[Criar Plano Manual]
+        PA[Gerar com IA]
+        PV2[Ver Planos]
+        PE2[Editar Plano]
+        PD2[Excluir Plano]
+        PAT2[Ativar/Desativar]
+    end
+    
+    subgraph DASH[📊 DASHBOARD]
+        DV[Ver Dashboard]
+        DM[Métricas do Dia]
+        DA[Atividade Recente]
+        DE[Estatísticas]
+        DG[Gráficos]
+    end
+    
+    subgraph SEARCH[🔍 BUSCA]
+        SG[Busca Global]
+        SF[Filtrar Resultados]
+        SN[Navegação Rápida]
+    end
+    
+    %% Sistemas Externos
+    AI[🤖<br/>SISTEMA IA]
+    DB[🗄️<br/>BANCO DADOS]
+    
+    %% Relacionamentos Principais
+    N --> AUTH
+    N --> PAT
+    N --> CONS
+    N --> MED
+    N --> PLAN
+    N --> DASH
+    N --> SEARCH
+    
+    %% Relacionamentos com Sistemas
+    AI --> PA
+    DB --> MI
+    DB --> L
+    
+    %% Relacionamentos Internos
+    PA -.-> PM
+    MR --> MI
+    PV --> MG
+    PC --> PV
+    
+    %% Estilos
+    classDef actor fill:#e1f5fe,stroke:#0277bd,stroke-width:3px,color:#000,font-weight:bold
+    classDef system fill:#e8f5e8,stroke:#4caf50,stroke-width:3px,color:#000,font-weight:bold
+    classDef usecase fill:#fff9c4,stroke:#f57f17,stroke-width:1px,color:#000
+    classDef subgraphAuth fill:#ffebee,stroke:#d32f2f,stroke-width:2px
+    classDef subgraphPat fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef subgraphCons fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef subgraphMed fill:#e0f2f1,stroke:#00695c,stroke-width:2px
+    classDef subgraphPlan fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    classDef subgraphDash fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    classDef subgraphSearch fill:#f1f8e9,stroke:#558b2f,stroke-width:2px
+    
+    %% Aplicar estilos
+    class N,AI,DB actor
+    class L,R,P,S,O,PC,PL,PV,PE,PD,PF,CA,CL,CR,CC,CF,CD,MR,MH,ME,MD,MI,MG,PM,PA,PV2,PE2,PD2,PAT2,DV,DM,DA,DE,DG,SG,SF,SN usecase

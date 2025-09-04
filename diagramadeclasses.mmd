@@ -1,0 +1,152 @@
+classDiagram
+    class Nutritionist {
+        +String id
+        +String name
+        +String email
+        +String password
+        +String role
+        +Date createdAt
+        +Date updatedAt
+        +register()
+        +login()
+        +updateProfile()
+        +logout()
+    }
+
+    class Patient {
+        +String id
+        +String nutritionistId
+        +String fullName
+        +String email
+        +String phone
+        +Date birthDate
+        +String sex
+        +Float weight
+        +Float height
+        +String goal
+        +JSON allergies
+        +String notes
+        +Date createdAt
+        +Date updatedAt
+        +calculateAge()
+        +calculateBMI()
+    }
+
+    class Appointment {
+        +String id
+        +String nutritionistId
+        +String patientId
+        +DateTime startAt
+        +DateTime endAt
+        +String status
+        +String notes
+        +Date createdAt
+        +Date updatedAt
+        +schedule()
+        +reschedule()
+        +cancel()
+        +complete()
+    }
+
+    class Measurement {
+        +String id
+        +String patientId
+        +DateTime date
+        +Float weight
+        +Float heightCm
+        +Float bmi
+        +Float bodyFatPercentage
+        +Float waistCircumference
+        +Float hipCircumference
+        +Float armCircumference
+        +String notes
+        +Date createdAt
+        +Date updatedAt
+        +calculateBMI()
+    }
+
+    class Plan {
+        +String id
+        +String patientId
+        +String appointmentId
+        +String nutritionistId
+        +String name
+        +String description
+        +JSON meals
+        +Integer totalCalories
+        +JSON macros
+        +Boolean aiGenerated
+        +Boolean isActive
+        +Date createdAt
+        +Date updatedAt
+        +generateWithAI()
+        +toggleActive()
+    }
+
+    class Meal {
+        +String time
+        +String title
+        +String[] items
+        +Integer calories
+        +Macros macros
+        +calculateCalories()
+    }
+
+    class Macros {
+        +Float protein
+        +Float carbs
+        +Float fats
+        +calculateTotal()
+    }
+
+    class File {
+        +String id
+        +String patientId
+        +String nutritionistId
+        +String filename
+        +String url
+        +String mime
+        +Integer size
+        +DateTime uploadedAt
+    }
+
+    class AuthService {
+        +generateToken()
+        +verifyToken()
+        +hashPassword()
+        +verifyPassword()
+    }
+
+    class AIService {
+        +generatePlanSuggestion()
+        +buildFallbackPlan()
+        +normalizePlan()
+    }
+
+    class ValidationService {
+        +validatePatient()
+        +validateAppointment()
+        +validateMeasurement()
+        +validatePlan()
+    }
+
+    Nutritionist "1" --> "*" Patient : has
+    Nutritionist "1" --> "*" Appointment : schedules
+    Nutritionist "1" --> "*" Plan : creates
+    Nutritionist "1" --> "*" File : uploads
+    
+    Patient "1" --> "*" Appointment : attends
+    Patient "1" --> "*" Measurement : has
+    Patient "1" --> "*" Plan : follows
+    Patient "1" --> "*" File : owns
+    
+    Appointment "1" --> "0..1" Plan : generates
+    Plan "1" --> "*" Meal : contains
+    Meal "1" --> "1" Macros : has
+    
+    Nutritionist ..> AuthService : uses
+    Plan ..> AIService : uses
+    Patient ..> ValidationService : uses
+    Appointment ..> ValidationService : uses
+    Measurement ..> ValidationService : uses
+    Plan ..> ValidationService : uses
