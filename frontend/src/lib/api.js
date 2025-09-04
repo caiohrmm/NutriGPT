@@ -60,6 +60,13 @@ export const authAPI = {
     api.get('/me').then(res => res.data),
 }
 
+// User API functions
+export const userAPI = {
+  // Update user profile
+  updateProfile: (data) =>
+    api.put('/me', data).then(res => res.data),
+}
+
 // Patient API functions
 export const patientAPI = {
   // List patients with pagination and filters
@@ -150,4 +157,61 @@ export const appointmentAPI = {
   // Cancel appointment
   cancel: (id) =>
     api.post(`/appointments/${id}/cancel`).then(res => res.data),
+  
+  // Delete appointment
+  delete: (id) =>
+    api.delete(`/appointments/${id}`).then(() => {}),
+}
+
+// Meal Plan API functions
+export const planAPI = {
+  // Generate AI suggestion (preview only)
+  generateAISuggestion: (data) =>
+    api.post('/plans/ai/suggestion', data).then(res => res.data),
+  
+  // Create meal plan
+  create: (data) =>
+    api.post('/plans', data).then(res => res.data),
+  
+  // Get meal plan by ID
+  getById: (id) =>
+    api.get(`/plans/${id}`).then(res => res.data),
+  
+  // List meal plans by patient
+  listByPatient: (patientId) =>
+    api.get(`/patients/${patientId}/plans`).then(res => res.data),
+  
+  // Update meal plan
+  update: (id, data) =>
+    api.put(`/plans/${id}`, data).then(res => res.data),
+  
+  // Toggle active status
+  toggleActive: (id) =>
+    api.patch(`/plans/${id}/toggle-active`).then(res => res.data),
+  
+  // Delete meal plan
+  delete: (id) =>
+    api.delete(`/plans/${id}`).then(() => {}),
+}
+
+// Search API functions
+export const searchAPI = {
+  // Global search combining patients and appointments
+  global: async (query, limit = 10) => {
+    try {
+      const [patientsResponse, appointmentsResponse] = await Promise.all([
+        patientAPI.list({ name: query, limit: Math.ceil(limit / 2) }),
+        appointmentAPI.list({ patient: query, limit: Math.ceil(limit / 2) })
+      ])
+
+      return {
+        patients: patientsResponse.data || [],
+        appointments: appointmentsResponse.data || [],
+        total: (patientsResponse.data?.length || 0) + (appointmentsResponse.data?.length || 0)
+      }
+    } catch (error) {
+      console.error('Global search error:', error)
+      return { patients: [], appointments: [], total: 0 }
+    }
+  }
 }

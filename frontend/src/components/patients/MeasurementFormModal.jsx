@@ -5,21 +5,27 @@ import { z } from 'zod'
 import { Weight, Ruler, Activity, Calendar } from 'lucide-react'
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogBody,
-  DialogFooter,
-} from '../ui/dialog'
+  ContentDialog as Dialog,
+  ContentDialogContent as DialogContent,
+  ContentDialogHeader as DialogHeader,
+  ContentDialogTitle as DialogTitle,
+  ContentDialogDescription as DialogDescription,
+  ContentDialogBody as DialogBody,
+  ContentDialogFooter as DialogFooter,
+} from '../ui/content-dialog'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { measurementAPI } from '../../lib/api'
+import { getTodayForInput } from '../../utils/dateUtils'
 
 const measurementSchema = z.object({
-  date: z.string(),
+  date: z.string().refine((date) => {
+    const measurementDate = new Date(date);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // End of today
+    return measurementDate <= today;
+  }, { message: 'Data não pode ser no futuro' }),
   weight: z.string().optional(),
   heightCm: z.string().optional(),
   bodyFatPercentage: z.string().optional(),
@@ -111,7 +117,7 @@ export function MeasurementFormModal({
       // Convert form data to API format
       const apiData = {
         patientId,
-        date: data.date ? new Date(data.date).toISOString() : new Date().toISOString(),
+        date: new Date(data.date + 'T12:00:00.000Z').toISOString(), // Convert to ISO datetime format // Send date as string in YYYY-MM-DD format
         weight: data.weight ? parseFloat(data.weight) : undefined,
         heightCm: data.heightCm ? parseFloat(data.heightCm) : undefined,
         bodyFatPercentage: data.bodyFatPercentage ? parseFloat(data.bodyFatPercentage) : undefined,
@@ -174,6 +180,7 @@ export function MeasurementFormModal({
                 <Input
                   id="date"
                   type="date"
+                  max={getTodayForInput()}
                   className="pl-10"
                   {...register('date')}
                 />

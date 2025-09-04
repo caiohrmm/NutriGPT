@@ -1,67 +1,67 @@
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  Users, 
-  Calendar, 
-  User, 
-  Menu, 
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Users,
+  Calendar,
+  User,
+  Menu,
   X,
   ChevronLeft,
   LogOut,
-  LayoutDashboard
-} from 'lucide-react'
-import { Link, useLocation } from 'react-router-dom'
+  LayoutDashboard,
+} from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 
-import { Button } from '../ui/button'
-import { Logo } from '../ui/logo'
-import { useAuth } from '../../context/AuthContext'
-import { cn } from '../../lib/utils'
+import { Button } from "../ui/button";
+import { Logo } from "../ui/logo";
+import { useAuth } from "../../context/AuthContext";
+import { cn } from "../../lib/utils";
 
 const navigation = [
   {
-    name: 'Pacientes',
-    href: '/patients',
+    name: "Dashboard",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    name: "Pacientes",
+    href: "/patients",
     icon: Users,
   },
   {
-    name: 'Consultas',
-    href: '/appointments',
+    name: "Consultas",
+    href: "/appointments",
     icon: Calendar,
   },
   {
-    name: 'Meu Perfil',
-    href: '/profile',
+    name: "Meu Perfil",
+    href: "/profile",
     icon: User,
   },
-  {
-    name: 'Dashboard',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-  },
-]
+];
 
 export function Sidebar({ isOpen, setIsOpen, className }) {
-  const location = useLocation()
-  const { user, logout } = useAuth()
-  const [isDesktop, setIsDesktop] = useState(false)
+  const location = useLocation();
+  const { user, logout } = useAuth();
+  const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
     const checkDesktop = () => {
-      setIsDesktop(window.innerWidth >= 1024)
-    }
-    
-    checkDesktop()
-    window.addEventListener('resize', checkDesktop)
-    return () => window.removeEventListener('resize', checkDesktop)
-  }, [])
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+
+    checkDesktop();
+    window.addEventListener("resize", checkDesktop);
+    return () => window.removeEventListener("resize", checkDesktop);
+  }, []);
 
   const handleLogout = async () => {
-    await logout()
-  }
+    await logout();
+  };
 
   // Desktop: always show sidebar
   // Mobile: show based on isOpen state
-  const shouldShow = isDesktop || isOpen
+  const shouldShow = isDesktop || isOpen;
 
   return (
     <>
@@ -85,13 +85,13 @@ export function Sidebar({ isOpen, setIsOpen, className }) {
           x: shouldShow ? 0 : -320,
         }}
         transition={{
-          type: 'spring',
+          type: "spring",
           stiffness: 300,
           damping: 30,
         }}
         className={cn(
-          'h-screen w-80 bg-white border-r border-gray-200 overflow-hidden flex-shrink-0',
-          isDesktop ? 'relative' : 'fixed left-0 top-0 z-50',
+          "h-screen w-80 bg-white border-r border-gray-200 overflow-hidden flex-shrink-0",
+          isDesktop ? "fixed left-0 top-0 z-40" : "fixed left-0 top-0 z-50",
           className
         )}
       >
@@ -120,9 +120,7 @@ export function Sidebar({ isOpen, setIsOpen, className }) {
                 <p className="text-sm font-medium text-gray-900 truncate">
                   {user?.name}
                 </p>
-                <p className="text-xs text-gray-600 truncate">
-                  {user?.email}
-                </p>
+                <p className="text-xs text-gray-600 truncate">{user?.email}</p>
               </div>
             </div>
           </div>
@@ -130,25 +128,25 @@ export function Sidebar({ isOpen, setIsOpen, className }) {
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2">
             {navigation.map((item) => {
-              const isActive = location.pathname === item.href
-              const Icon = item.icon
+              const isActive = location.pathname === item.href;
+              const Icon = item.icon;
 
               return (
                 <Link
                   key={item.name}
                   to={item.href}
                   className={cn(
-                    'flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
+                    "flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
                     isActive
-                      ? 'bg-primary text-white shadow-sm'
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                      ? "bg-primary text-white shadow-sm"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                   )}
                   onClick={() => !isDesktop && setIsOpen(false)}
                 >
                   <Icon className="h-5 w-5" />
                   <span>{item.name}</span>
                 </Link>
-              )
+              );
             })}
           </nav>
 
@@ -166,7 +164,7 @@ export function Sidebar({ isOpen, setIsOpen, className }) {
         </div>
       </motion.aside>
     </>
-  )
+  );
 }
 
 // Mobile menu button
@@ -175,10 +173,10 @@ export function MobileMenuButton({ onClick, className }) {
     <Button
       variant="ghost"
       size="sm"
-      className={cn('lg:hidden', className)}
+      className={cn("lg:hidden", className)}
       onClick={onClick}
     >
       <Menu className="h-5 w-5" />
     </Button>
-  )
+  );
 }

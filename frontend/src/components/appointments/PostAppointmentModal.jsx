@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { CheckCircle, Plus, Activity } from 'lucide-react'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogBody,
-  DialogFooter,
-} from '../ui/dialog'
+  ContentDialog as Dialog,
+  ContentDialogContent as DialogContent,
+  ContentDialogHeader as DialogHeader,
+  ContentDialogTitle as DialogTitle,
+  ContentDialogDescription as DialogDescription,
+  ContentDialogBody as DialogBody,
+  ContentDialogFooter as DialogFooter,
+} from '../ui/content-dialog'
 import { Button } from '../ui/button'
 import { MeasurementFormModal } from '../patients/MeasurementFormModal'
 

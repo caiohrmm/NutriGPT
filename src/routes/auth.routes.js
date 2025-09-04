@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const { sequelize } = require('../sequelize');
 const { DataTypes } = require('sequelize');
 const { auth } = require('../middleware/auth');
+const { logger } = require('../utils/logger');
 
 // Lightweight model here to avoid circular imports during bootstrap
 const Nutritionist = sequelize.define('Nutritionist', {
@@ -99,6 +100,63 @@ router.get('/me', auth(true), async (req, res) => {
     return res.json({ user });
   } catch (_err) {
     return res.status(500).json({ message: 'Erro ao carregar o perfil' });
+  }
+});
+
+// Update user profile
+const updateProfileSchema = z.object({
+  name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres').optional(),
+  currentPassword: z.string().min(1, 'Senha atual é obrigatória').optional(),
+  newPassword: z.string().min(8, 'Nova senha deve ter pelo menos 8 caracteres').optional(),
+});
+
+router.put('/me', auth(true), async (req, res) => {
+  try {
+    const payload = updateProfileSchema.parse(req.body);
+    const user = await Nutritionist.findByPk(req.user.id);
+    
+    if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
+
+    const updateData = {};
+
+    // Update name if provided
+    if (payload.name) {
+      updateData.name = payload.name;
+    }
+
+    // Update password if provided
+    if (payload.newPassword) {
+      if (!payload.currentPassword) {
+        return res.status(400).json({ message: 'Senha atual é obrigatória para alterar a senha' });
+      }
+      
+      const isCurrentPasswordValid = await verifyPassword(payload.currentPassword, user.password);
+      if (!isCurrentPasswordValid) {
+        return res.status(400).json({ message: 'Senha atual incorreta' });
+      }
+      
+      updateData.password = await hashPassword(payload.newPassword);
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ message: 'Nenhum dado para atualizar' });
+    }
+
+    await user.update(updateData);
+    
+    // Return updated user without password
+    const updatedUser = await Nutritionist.findByPk(req.user.id, {
+      attributes: ['id', 'name', 'email', 'role', 'createdAt', 'updatedAt'],
+    });
+    
+    return res.json({ user: updatedUser, message: 'Perfil atualizado com sucesso' });
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      const details = err.issues.map((i) => ({ field: i.path.join('.'), message: i.message, code: i.code }));
+      return res.status(400).json({ message: 'Dados inválidos', details });
+    }
+    logger?.error({ err }, 'profile.update.error');
+    return res.status(500).json({ message: 'Erro ao atualizar perfil' });
   }
 });
 

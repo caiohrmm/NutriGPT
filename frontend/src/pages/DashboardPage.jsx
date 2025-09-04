@@ -1,54 +1,158 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Users, Calendar, FileText, BarChart3, TrendingUp, Clock } from 'lucide-react'
+import { Users, Calendar, FileText, BarChart3, TrendingUp, Clock, Activity, Target } from 'lucide-react'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { DashboardLayout } from '../layouts/DashboardLayout'
 import { useAuth } from '../context/AuthContext'
+import { patientAPI, appointmentAPI, planAPI } from '../lib/api'
+import { formatDate, calculateAge } from '../utils/dateUtils'
 
 export function DashboardPage() {
   const { user } = useAuth()
+  const [loading, setLoading] = useState(true)
+  const [dashboardData, setDashboardData] = useState({
+    totalPatients: 0,
+    appointmentsToday: 0,
+    totalPlans: 0,
+    recentPatients: [],
+    upcomingAppointments: [],
+    recentActivity: []
+  })
+
+  useEffect(() => {
+    loadDashboardData()
+  }, [])
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true)
+      
+      const today = new Date()
+      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+      const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59)
+
+      // Load all data in parallel
+      const [patientsResponse, appointmentsResponse] = await Promise.all([
+        patientAPI.list({ limit: 1000 }),
+        appointmentAPI.list({ limit: 1000 })
+      ])
+
+      const patients = patientsResponse.data || []
+      const appointments = appointmentsResponse.data || []
+
+      // Filter today's appointments
+      const appointmentsToday = appointments.filter(apt => {
+        const aptDate = new Date(apt.startAt)
+        return aptDate >= todayStart && aptDate <= todayEnd
+      })
+
+      // Get upcoming appointments (next 5)
+      const upcomingAppointments = appointments
+        .filter(apt => new Date(apt.startAt) > new Date())
+        .sort((a, b) => new Date(a.startAt) - new Date(b.startAt))
+        .slice(0, 5)
+
+      // Get recent patients (last 5)
+      const recentPatients = patients
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 5)
+
+      // Count total plans (we'll need to implement this if not available)
+      let totalPlans = 0
+      try {
+        // Try to get plans for all patients
+        const planPromises = patients.slice(0, 10).map(patient => 
+          planAPI.listByPatient(patient.id).catch(() => ({ data: [] }))
+        )
+        const planResponses = await Promise.all(planPromises)
+        totalPlans = planResponses.reduce((total, response) => 
+          total + (response.data?.length || 0), 0
+        )
+      } catch (error) {
+        console.log('Could not load plans count:', error)
+      }
+
+      // Generate recent activity
+      const recentActivity = [
+        ...recentPatients.slice(0, 3).map(patient => ({
+          title: `Novo paciente: ${patient.fullName}`,
+          description: `${calculateAge(patient.birthDate)} - ${patient.goal || 'Sem objetivo definido'}`,
+          time: formatDate(patient.createdAt),
+          icon: Users,
+          color: 'text-blue-600'
+        })),
+        ...upcomingAppointments.slice(0, 2).map(apt => ({
+          title: `Consulta agendada`,
+          description: `${apt.Patient?.fullName} - ${formatDate(apt.startAt)}`,
+          time: 'Em breve',
+          icon: Calendar,
+          color: 'text-green-600'
+        }))
+      ].slice(0, 5)
+
+      setDashboardData({
+        totalPatients: patients.length,
+        appointmentsToday: appointmentsToday.length,
+        totalPlans,
+        recentPatients,
+        upcomingAppointments,
+        recentActivity: recentActivity.length > 0 ? recentActivity : [{
+          title: 'Sistema iniciado',
+          description: 'Bem-vindo ao NutriGPT!',
+          time: 'Agora',
+          icon: TrendingUp,
+          color: 'text-primary'
+        }]
+      })
+
+    } catch (error) {
+      console.error('Error loading dashboard data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const stats = [
     {
       title: 'Total de Pacientes',
-      value: '0',
-      description: 'Em breve você terá seus primeiros pacientes',
+      value: loading ? '...' : dashboardData.totalPatients.toString(),
+      description: dashboardData.totalPatients === 0 
+        ? 'Em breve você terá seus primeiros pacientes' 
+        : `${dashboardData.totalPatients} paciente${dashboardData.totalPatients !== 1 ? 's' : ''} cadastrado${dashboardData.totalPatients !== 1 ? 's' : ''}`,
       icon: Users,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
     },
     {
       title: 'Consultas Hoje',
-      value: '0',
-      description: 'Nenhuma consulta agendada para hoje',
+      value: loading ? '...' : dashboardData.appointmentsToday.toString(),
+      description: dashboardData.appointmentsToday === 0 
+        ? 'Nenhuma consulta agendada para hoje' 
+        : `${dashboardData.appointmentsToday} consulta${dashboardData.appointmentsToday !== 1 ? 's' : ''} hoje`,
       icon: Calendar,
       color: 'text-green-600',
       bgColor: 'bg-green-50',
     },
     {
       title: 'Planos Criados',
-      value: '0',
-      description: 'Planos alimentares personalizados',
+      value: loading ? '...' : dashboardData.totalPlans.toString(),
+      description: dashboardData.totalPlans === 0 
+        ? 'Crie seu primeiro plano alimentar' 
+        : `${dashboardData.totalPlans} plano${dashboardData.totalPlans !== 1 ? 's' : ''} alimentar${dashboardData.totalPlans !== 1 ? 'es' : ''}`,
       icon: FileText,
       color: 'text-purple-600',
       bgColor: 'bg-purple-50',
     },
     {
-      title: 'Taxa de Sucesso',
-      value: '--',
-      description: 'Baseado no progresso dos pacientes',
+      title: 'Próximas Consultas',
+      value: loading ? '...' : dashboardData.upcomingAppointments.length.toString(),
+      description: dashboardData.upcomingAppointments.length === 0 
+        ? 'Nenhuma consulta agendada' 
+        : `${dashboardData.upcomingAppointments.length} consulta${dashboardData.upcomingAppointments.length !== 1 ? 's' : ''} agendada${dashboardData.upcomingAppointments.length !== 1 ? 's' : ''}`,
       icon: BarChart3,
       color: 'text-orange-600',
       bgColor: 'bg-orange-50',
-    },
-  ]
-
-  const recentActivity = [
-    {
-      title: 'Sistema iniciado',
-      description: 'Bem-vindo ao NutriGPT!',
-      time: 'Agora',
-      icon: TrendingUp,
     },
   ]
 
@@ -198,12 +302,12 @@ export function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {recentActivity.map((activity, index) => {
+                  {dashboardData.recentActivity.map((activity, index) => {
                     const Icon = activity.icon
                     return (
                       <div key={index} className="flex items-start space-x-3">
-                        <div className="p-1 bg-primary/10 rounded-full">
-                          <Icon className="h-3 w-3 text-primary" />
+                        <div className={`p-1 rounded-full ${activity.color ? 'bg-current/10' : 'bg-primary/10'}`}>
+                          <Icon className={`h-3 w-3 ${activity.color || 'text-primary'}`} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900">

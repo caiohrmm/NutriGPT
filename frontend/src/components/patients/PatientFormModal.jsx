@@ -5,26 +5,33 @@ import { z } from 'zod'
 import { User, Mail, Phone, Target, Weight, Ruler } from 'lucide-react'
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogBody,
-  DialogFooter,
-} from '../ui/dialog'
+  ContentDialog as Dialog,
+  ContentDialogContent as DialogContent,
+  ContentDialogHeader as DialogHeader,
+  ContentDialogTitle as DialogTitle,
+  ContentDialogDescription as DialogDescription,
+  ContentDialogBody as DialogBody,
+  ContentDialogFooter as DialogFooter,
+} from '../ui/content-dialog'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { MaskedInput } from '../ui/masked-input'
 import { Label } from '../ui/label'
 import { GoalSelector } from './GoalSelector'
 import { patientAPI } from '../../lib/api'
+import { getTodayForInput } from '../../utils/dateUtils'
 
 const patientSchema = z.object({
   fullName: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
   email: z.string().email('Email inválido').optional().or(z.literal('')),
   phone: z.string().optional(),
-  birthDate: z.string().optional(),
+  birthDate: z.string().optional().refine((date) => {
+    if (!date) return true; // Allow empty dates
+    const birthDate = new Date(date);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // End of today
+    return birthDate <= today;
+  }, { message: 'Data de nascimento não pode ser no futuro' }),
   sex: z.enum(['M', 'F', '']).optional(),
   weight: z.string().optional(),
   height: z.string().optional(),
@@ -113,7 +120,7 @@ export function PatientFormModal({
         weight: data.weight ? parseFloat(data.weight) : null,
         height: data.height ? parseFloat(data.height) : null,
         goal: data.goal || null,
-        allergies: data.allergies ? data.allergies.split(',').map(a => a.trim()).filter(Boolean) : [],
+        allergies: data.allergies || null,
         notes: data.notes || null,
       }
 
@@ -218,8 +225,12 @@ export function PatientFormModal({
                 <Input
                   id="birthDate"
                   type="date"
+                  max={getTodayForInput()}
                   {...register('birthDate')}
                 />
+                {errors.birthDate && (
+                  <p className="text-sm text-destructive mt-1">{errors.birthDate.message}</p>
+                )}
               </div>
 
               <div>

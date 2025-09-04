@@ -17,6 +17,7 @@ const Plan = sequelize.define('Plan', {
   totalCalories: { type: DataTypes.INTEGER, allowNull: true },
   macros: { type: DataTypes.JSON, allowNull: false },
   aiGenerated: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+  isActive: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 }, { tableName: 'Plan' });
 
 const Patient = sequelize.define('Patient', {
@@ -47,7 +48,7 @@ const mealSchema = z.object({
   time: z.string().min(1),
   title: z.string().min(1),
   items: z.array(z.string()).min(1),
-  calories: z.number().int().positive().max(3000).nullable().optional(),
+  calories: z.number().int().min(0).max(3000).nullable().optional(),
   macros: z.object({
     protein: z.number().min(0).max(300).nullable().optional(),
     carbs: z.number().min(0).max(600).nullable().optional(),
@@ -61,13 +62,14 @@ const planBodySchema = z.object({
   name: z.string().min(2).max(255),
   description: z.string().max(10000).optional().nullable(),
   meals: z.array(mealSchema).min(1),
-  totalCalories: z.number().int().positive().max(5000).nullable().optional(),
+  totalCalories: z.number().int().min(0).max(5000).nullable().optional(),
   macros: z.object({
     protein: z.number().min(0).max(400).nullable().optional(),
     carbs: z.number().min(0).max(800).nullable().optional(),
     fats: z.number().min(0).max(300).nullable().optional(),
   }).optional(),
   aiGenerated: z.boolean().optional(),
+  isActive: z.boolean().optional(),
 });
 
 const aiInputSchema = z.object({
@@ -114,6 +116,14 @@ router.post('/plans', auth(true), async (req, res) => {
     const own = await ensureOwnership(req, body.patientId, body.appointmentId);
     if (own.error) return fail(res, 404, own.error);
 
+    // If this plan is being set as active, deactivate other plans for this patient
+    if (body.isActive) {
+      await Plan.update(
+        { isActive: false },
+        { where: { patientId: body.patientId, nutritionistId: req.user.id } }
+      );
+    }
+
     const createdPlan = await Plan.create({
       nutritionistId: req.user.id,
       patientId: body.patientId,
@@ -124,10 +134,14 @@ router.post('/plans', auth(true), async (req, res) => {
       totalCalories: body.totalCalories ?? null,
       macros: body.macros || { protein: null, carbs: null, fats: null },
       aiGenerated: Boolean(body.aiGenerated),
+      isActive: Boolean(body.isActive),
     });
+    
     return created(res, { plan: createdPlan });
   } catch (err) {
-    if (err instanceof z.ZodError) return fail(res, 400, 'Dados inválidos');
+    if (err instanceof z.ZodError) {
+      return fail(res, 400, `Dados inválidos: ${err.errors.map(e => e.message).join(', ')}`);
+    }
     return fail(res, 500, 'Erro ao criar plano');
   }
 });
@@ -175,6 +189,20 @@ router.put('/plans/:id', auth(true), async (req, res) => {
       if (own.error) return fail(res, 404, own.error);
     }
 
+    // If this plan is being set as active, deactivate other plans for this patient
+    if (body.isActive) {
+      await Plan.update(
+        { isActive: false },
+        { 
+          where: { 
+            patientId: body.patientId || plan.patientId, 
+            nutritionistId: req.user.id,
+            id: { [require('sequelize').Op.ne]: id } // Exclude current plan
+          } 
+        }
+      );
+    }
+
     await plan.update({
       ...(body.patientId ? { patientId: body.patientId } : {}),
       ...(body.appointmentId !== undefined ? { appointmentId: body.appointmentId ?? null } : {}),
@@ -184,11 +212,43 @@ router.put('/plans/:id', auth(true), async (req, res) => {
       ...(body.totalCalories !== undefined ? { totalCalories: body.totalCalories ?? null } : {}),
       ...(body.macros ? { macros: body.macros } : {}),
       ...(body.aiGenerated !== undefined ? { aiGenerated: Boolean(body.aiGenerated) } : {}),
+      ...(body.isActive !== undefined ? { isActive: Boolean(body.isActive) } : {}),
     });
     return ok(res, { plan });
   } catch (err) {
     if (err instanceof z.ZodError) return fail(res, 400, 'Dados inválidos');
     return fail(res, 500, 'Erro ao atualizar plano');
+  }
+});
+
+// Ativar/desativar plano
+router.patch('/plans/:id/toggle-active', auth(true), async (req, res) => {
+  try {
+    const id = req.params.id;
+    const plan = await Plan.findByPk(id);
+    if (!plan) return fail(res, 404, 'Plano não encontrado');
+    if (plan.nutritionistId !== req.user.id) return fail(res, 404, 'Plano não encontrado');
+
+    const newActiveState = !plan.isActive;
+    
+    // If activating this plan, deactivate others for this patient
+    if (newActiveState) {
+      await Plan.update(
+        { isActive: false },
+        { 
+          where: { 
+            patientId: plan.patientId, 
+            nutritionistId: req.user.id,
+            id: { [require('sequelize').Op.ne]: id }
+          } 
+        }
+      );
+    }
+
+    await plan.update({ isActive: newActiveState });
+    return ok(res, { plan });
+  } catch (_err) {
+    return fail(res, 500, 'Erro ao alterar status do plano');
   }
 });
 

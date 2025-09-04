@@ -5,21 +5,29 @@ const { sequelize } = require('../sequelize');
 const { DataTypes, Op } = require('sequelize');
 const { logger } = require('../utils/logger');
 
-// Lightweight model to avoid import cycles
+// Lightweight models to avoid import cycles
 const Patient = sequelize.define('Patient', {
   id: { type: DataTypes.STRING, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
   nutritionistId: { type: DataTypes.STRING, allowNull: false },
   fullName: { type: DataTypes.STRING, allowNull: false },
-  email: { type: DataTypes.STRING, allowNull: true, unique: true },
+  email: { type: DataTypes.STRING, allowNull: true },
   phone: { type: DataTypes.STRING, allowNull: true },
   birthDate: { type: DataTypes.DATE, allowNull: true },
   sex: { type: DataTypes.STRING, allowNull: true },
   weight: { type: DataTypes.FLOAT, allowNull: true },
   height: { type: DataTypes.FLOAT, allowNull: true },
   goal: { type: DataTypes.STRING, allowNull: true },
-  allergies: { type: DataTypes.JSON, allowNull: false, defaultValue: [] },
+  allergies: { type: DataTypes.JSON, allowNull: true, defaultValue: [] },
   notes: { type: DataTypes.TEXT, allowNull: true },
 }, { tableName: 'Patient' });
+
+const Nutritionist = sequelize.define('Nutritionist', {
+  id: { type: DataTypes.STRING, primaryKey: true },
+  name: { type: DataTypes.STRING, allowNull: false },
+  email: { type: DataTypes.STRING, allowNull: false, unique: true },
+  password: { type: DataTypes.STRING, allowNull: false },
+  role: { type: DataTypes.STRING, allowNull: false, defaultValue: 'nutritionist' },
+}, { tableName: 'Nutritionist' });
 
 const router = Router();
 
@@ -27,7 +35,13 @@ const createPatientSchema = z.object({
   fullName: z.string({ required_error: 'fullName é obrigatório' }).min(2, 'fullName deve ter ao menos 2 caracteres'),
   email: z.string().email('email inválido').optional().nullable(),
   phone: z.string().max(20, 'phone muito longo').optional().nullable(),
-  birthDate: z.string().optional().nullable(),
+  birthDate: z.string().optional().nullable().refine((date) => {
+    if (!date) return true; // Allow null/empty dates
+    const birthDate = new Date(date);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // End of today
+    return birthDate <= today;
+  }, { message: 'Data de nascimento não pode ser no futuro' }),
   sex: z.enum(['M', 'F']).optional().nullable(),
   weight: z.coerce.number().positive('weight deve ser > 0').max(1000, 'weight muito alto').optional(),
   height: z.coerce.number().positive('height deve ser > 0').max(300, 'height muito alto').optional(),
@@ -42,8 +56,20 @@ router.post('/patients', auth(true), async (req, res) => {
   try {
     const payload = createPatientSchema.parse(req.body);
     if (payload.email) {
-      const exists = await Patient.findOne({ where: { email: payload.email } });
-      if (exists) return res.status(409).json({ message: 'Email de paciente já está em uso' });
+      // Check if email is the same as the nutritionist's email
+      const nutritionist = await Nutritionist.findByPk(req.user.id);
+      if (nutritionist && payload.email === nutritionist.email) {
+        return res.status(400).json({ message: 'Não é possível cadastrar um paciente com o seu próprio email' });
+      }
+      
+      // Check if patient with same email already exists for this nutritionist
+      const exists = await Patient.findOne({ 
+        where: { 
+          email: payload.email, 
+          nutritionistId: req.user.id 
+        } 
+      });
+      if (exists) return res.status(409).json({ message: 'Email de paciente já está em uso para este nutricionista' });
     }
     const created = await Patient.create({
       nutritionistId: req.user.id,
@@ -134,8 +160,20 @@ router.put('/patients/:id', auth(true), async (req, res) => {
     if (!patient) return res.status(404).json({ message: 'Paciente não encontrado' });
 
     if (payload.email && payload.email !== patient.email) {
-      const exists = await Patient.findOne({ where: { email: payload.email } });
-      if (exists) return res.status(409).json({ message: 'Email de paciente já está em uso' });
+      // Check if email is the same as the nutritionist's email
+      const nutritionist = await Nutritionist.findByPk(req.user.id);
+      if (nutritionist && payload.email === nutritionist.email) {
+        return res.status(400).json({ message: 'Não é possível cadastrar um paciente com o seu próprio email' });
+      }
+      
+      // Check if patient with same email already exists for this nutritionist
+      const exists = await Patient.findOne({ 
+        where: { 
+          email: payload.email, 
+          nutritionistId: req.user.id 
+        } 
+      });
+      if (exists) return res.status(409).json({ message: 'Email de paciente já está em uso para este nutricionista' });
     }
 
     const updateData = {

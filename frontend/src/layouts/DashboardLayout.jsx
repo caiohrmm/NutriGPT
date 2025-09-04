@@ -37,20 +37,20 @@ export function DashboardLayout({ children, title }) {
         />
 
         {/* Main content area */}
-        <div className="flex-1 flex flex-col min-w-0 relative z-10 lg:ml-0">
-        <Header 
-          onMenuClick={() => setSidebarOpen(true)} 
-          title={title}
-        />
-        
-        {/* Page content */}
-        <main className="flex-1 overflow-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {children}
-          </div>
-        </main>
+        <div className="flex-1 flex flex-col min-w-0 relative z-10 lg:ml-80">
+          <Header 
+            onMenuClick={() => setSidebarOpen(true)} 
+            title={title}
+          />
+          
+          {/* Page content */}
+          <main className="flex-1 overflow-auto">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              {children}
+            </div>
+          </main>
 
-        <Footer />
+          <Footer />
         </div>
       </div>
     </div>

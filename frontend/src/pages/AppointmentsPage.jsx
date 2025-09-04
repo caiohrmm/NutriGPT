@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
+import { useToasts } from '../components/ui/toast'
+import { useConfirm } from '../components/ui/confirmation-modal'
 import { motion } from 'framer-motion'
 import { 
   Calendar, 
@@ -37,11 +39,10 @@ import {
 import { DashboardLayout } from '../layouts/DashboardLayout'
 import { AppointmentFormModal } from '../components/appointments/AppointmentFormModal'
 import { PostAppointmentModal } from '../components/appointments/PostAppointmentModal'
-import { useToasts } from '../components/ui/toast'
-import { useConfirm } from '../components/ui/confirmation-modal'
 import { appointmentAPI } from '../lib/api'
 
 export function AppointmentsPage() {
+  const [searchParams] = useSearchParams()
   const toast = useToasts()
   const confirm = useConfirm()
   const [appointments, setAppointments] = useState([])
@@ -60,6 +61,15 @@ export function AppointmentsPage() {
   const [completedAppointment, setCompletedAppointment] = useState(null)
   
   const pageSize = 10
+
+  // Initialize search from URL params
+  useEffect(() => {
+    const searchFromUrl = searchParams.get('search')
+    if (searchFromUrl) {
+      setSearchInput(searchFromUrl)
+      setSearchTerm(searchFromUrl)
+    }
+  }, [searchParams])
 
   const loadAppointments = async () => {
     setLoading(true)
@@ -119,24 +129,38 @@ export function AppointmentsPage() {
   const handleCancelAppointment = async (appointment) => {
     const confirmed = await confirm.cancel(`a consulta de ${appointment.Patient?.fullName}`)
     if (!confirmed) return
-
+    
     try {
       await appointmentAPI.cancel(appointment.id)
-      toast.success(`Consulta de ${appointment.Patient?.fullName} cancelada`)
-      loadAppointments() // Reload list
+      toast.success('Consulta cancelada com sucesso!')
+      loadAppointments() // Reload list after cancel
     } catch (error) {
       console.error('Error canceling appointment:', error)
-      toast.error(error.response?.data?.message || 'Erro ao cancelar consulta')
+      toast.error('Erro ao cancelar consulta. Tente novamente.')
+    }
+  }
+
+  const handleDeleteAppointment = async (appointment) => {
+    const confirmed = await confirm.delete(`a consulta de ${appointment.Patient?.fullName}`)
+    if (!confirmed) return
+    
+    try {
+      await appointmentAPI.delete(appointment.id)
+      toast.success('Consulta excluída com sucesso!')
+      loadAppointments() // Reload list after delete
+    } catch (error) {
+      console.error('Error deleting appointment:', error)
+      toast.error('Erro ao excluir consulta. Tente novamente.')
     }
   }
 
   const handleCompleteAppointment = async (appointment) => {
     const confirmed = await confirm.complete(`a consulta de ${appointment.Patient?.fullName}`)
     if (!confirmed) return
-
+    
     try {
       await appointmentAPI.update(appointment.id, { status: 'done' })
-      toast.success(`Consulta de ${appointment.Patient?.fullName} marcada como realizada`)
+      toast.success('Consulta finalizada com sucesso!')
       
       // Show post-appointment modal for adding measurements
       setCompletedAppointment(appointment)
@@ -145,7 +169,7 @@ export function AppointmentsPage() {
       loadAppointments() // Reload list
     } catch (error) {
       console.error('Error completing appointment:', error)
-      toast.error(error.response?.data?.message || 'Erro ao marcar consulta como realizada')
+      toast.error('Erro ao finalizar consulta. Tente novamente.')
     }
   }
 
@@ -155,11 +179,12 @@ export function AppointmentsPage() {
   }
 
   const handlePostAppointmentAddMeasurement = () => {
-    toast.info('Medição adicionada com sucesso!')
+    toast.success('Medição adicionada com sucesso!')
   }
 
   const handlePostAppointmentFinish = () => {
     setCompletedAppointment(null)
+    setIsPostAppointmentModalOpen(false)
   }
 
   const getStatusInfo = (status) => {
@@ -385,13 +410,15 @@ export function AppointmentsPage() {
                           <ActionMenu>
                             {(closeMenu) => (
                               <>
-                                <ActionMenuItem onClick={() => {
-                                  handleEditAppointment(appointment)
-                                  closeMenu()
-                                }}>
-                                  <Edit className="h-4 w-4 mr-3" />
-                                  Reagendar Consulta
-                                </ActionMenuItem>
+                                {appointment.status !== 'done' && (
+                                  <ActionMenuItem onClick={() => {
+                                    handleEditAppointment(appointment)
+                                    closeMenu()
+                                  }}>
+                                    <Edit className="h-4 w-4 mr-3" />
+                                    Reagendar Consulta
+                                  </ActionMenuItem>
+                                )}
                                 
                                 {appointment.status === 'scheduled' && (
                                   <>
@@ -433,6 +460,19 @@ export function AppointmentsPage() {
                                     Reagendar Consulta
                                   </ActionMenuItem>
                                 )}
+
+                                <ActionMenuSeparator />
+                                
+                                <ActionMenuItem 
+                                  variant="destructive"
+                                  onClick={() => {
+                                    handleDeleteAppointment(appointment)
+                                    closeMenu()
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-3" />
+                                  Excluir Consulta
+                                </ActionMenuItem>
                               </>
                             )}
                           </ActionMenu>

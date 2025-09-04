@@ -218,6 +218,20 @@ router.post('/appointments/:id/cancel', auth(true), async (req, res) => {
   }
 });
 
+// Delete appointment
+router.delete('/appointments/:id', auth(true), async (req, res) => {
+  try {
+    const id = req.params.id;
+    const appointment = await Appointment.findOne({ where: { id, nutritionistId: req.user.id } });
+    if (!appointment) return res.status(404).json({ message: 'Consulta não encontrada' });
+
+    await appointment.destroy();
+    return res.status(204).send();
+  } catch (_err) {
+    return res.status(500).json({ message: 'Erro ao excluir consulta' });
+  }
+});
+
 module.exports = router;
 
 

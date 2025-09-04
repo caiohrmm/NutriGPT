@@ -4,18 +4,18 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from './button'
 import { cn } from '../../lib/utils'
 
-const DialogContext = createContext()
+const ContentDialogContext = createContext()
 
-export function Dialog({ children, open, onOpenChange }) {
+export function ContentDialog({ children, open, onOpenChange }) {
   return (
-    <DialogContext.Provider value={{ open, onOpenChange }}>
+    <ContentDialogContext.Provider value={{ open, onOpenChange }}>
       {children}
-    </DialogContext.Provider>
+    </ContentDialogContext.Provider>
   )
 }
 
-export function DialogTrigger({ children, asChild, ...props }) {
-  const { onOpenChange } = useContext(DialogContext)
+export function ContentDialogTrigger({ children, asChild, ...props }) {
+  const { onOpenChange } = useContext(ContentDialogContext)
   
   if (asChild) {
     return children
@@ -28,24 +28,40 @@ export function DialogTrigger({ children, asChild, ...props }) {
   )
 }
 
-export function DialogContent({ children, className, ...props }) {
-  const { open, onOpenChange } = useContext(DialogContext)
+export function ContentDialogContent({ children, className, ...props }) {
+  const { open, onOpenChange } = useContext(ContentDialogContext)
   
   return (
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop - covers entire content area including header (excludes sidebar) */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100]"
+            className="fixed bg-black/50 backdrop-blur-sm"
+            style={{ 
+              top: '0px',
+              left: '320px', // Fixed 320px after sidebar
+              right: '0px',
+              bottom: '0px',
+              zIndex: 100,
+            }}
             onClick={() => onOpenChange(false)}
           />
           
-          {/* Dialog Container */}
-          <div className="fixed inset-0 z-[101] flex items-center justify-center p-4">
+          {/* Dialog Container - positioned relative to content area */}
+          <div 
+            className="fixed flex items-center justify-center p-4"
+            style={{ 
+              top: '0px',
+              left: '320px', // Fixed 320px after sidebar
+              right: '0px',
+              bottom: '0px',
+              zIndex: 101,
+            }}
+          >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -53,7 +69,7 @@ export function DialogContent({ children, className, ...props }) {
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               className={cn(
                 'relative bg-white rounded-lg shadow-xl border border-gray-200',
-                'w-full max-w-lg max-h-[90vh] overflow-y-auto',
+                'w-full max-h-[90vh] overflow-y-auto',
                 'mx-auto',
                 className
               )}
@@ -79,7 +95,7 @@ export function DialogContent({ children, className, ...props }) {
   )
 }
 
-export function DialogHeader({ children, className, ...props }) {
+export function ContentDialogHeader({ children, className, ...props }) {
   return (
     <div className={cn('px-6 py-4 border-b border-gray-200', className)} {...props}>
       {children}
@@ -87,7 +103,7 @@ export function DialogHeader({ children, className, ...props }) {
   )
 }
 
-export function DialogTitle({ children, className, ...props }) {
+export function ContentDialogTitle({ children, className, ...props }) {
   return (
     <h2 className={cn('text-lg font-semibold text-gray-900', className)} {...props}>
       {children}
@@ -95,7 +111,7 @@ export function DialogTitle({ children, className, ...props }) {
   )
 }
 
-export function DialogDescription({ children, className, ...props }) {
+export function ContentDialogDescription({ children, className, ...props }) {
   return (
     <p className={cn('text-sm text-gray-600 mt-1', className)} {...props}>
       {children}
@@ -103,7 +119,7 @@ export function DialogDescription({ children, className, ...props }) {
   )
 }
 
-export function DialogBody({ children, className, ...props }) {
+export function ContentDialogBody({ children, className, ...props }) {
   return (
     <div className={cn('px-6 py-4', className)} {...props}>
       {children}
@@ -111,7 +127,7 @@ export function DialogBody({ children, className, ...props }) {
   )
 }
 
-export function DialogFooter({ children, className, ...props }) {
+export function ContentDialogFooter({ children, className, ...props }) {
   return (
     <div className={cn('px-6 py-4 border-t border-gray-200 flex justify-end space-x-2', className)} {...props}>
       {children}

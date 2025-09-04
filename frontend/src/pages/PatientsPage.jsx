@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { 
   Users, 
@@ -40,9 +40,11 @@ import { AppointmentFormModal } from '../components/appointments/AppointmentForm
 import { useToasts } from '../components/ui/toast'
 import { useConfirm } from '../components/ui/confirmation-modal'
 import { patientAPI } from '../lib/api'
+import { calculateAge } from '../utils/dateUtils'
 
 export function PatientsPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const toast = useToasts()
   const confirm = useConfirm()
   const [patients, setPatients] = useState([])
@@ -61,6 +63,15 @@ export function PatientsPage() {
   const [selectedPatientForAppointment, setSelectedPatientForAppointment] = useState(null)
   
   const pageSize = 10
+
+  // Initialize search from URL params
+  useEffect(() => {
+    const searchFromUrl = searchParams.get('search')
+    if (searchFromUrl) {
+      setSearchInput(searchFromUrl)
+      setSearchTerm(searchFromUrl)
+    }
+  }, [searchParams])
 
   const loadPatients = async () => {
     setLoading(true)
@@ -145,18 +156,7 @@ export function PatientsPage() {
     toast.success('Consulta agendada com sucesso!')
   }
 
-  const calculateAge = (birthDate) => {
-    if (!birthDate) return null
-    const birth = new Date(birthDate)
-    const today = new Date()
-    const age = today.getFullYear() - birth.getFullYear()
-    const monthDiff = today.getMonth() - birth.getMonth()
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-      return age - 1
-    }
-    return age
-  }
+
 
   const calculateBMI = (weight, height) => {
     if (!weight || !height) return null
@@ -317,7 +317,7 @@ export function PatientsPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          {age ? `${age} anos` : <span className="text-gray-400">-</span>}
+                          <span className="text-sm">{age}</span>
                         </TableCell>
                         <TableCell>
                           {bmi ? (

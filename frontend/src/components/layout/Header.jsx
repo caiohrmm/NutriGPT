@@ -1,7 +1,6 @@
-import { Search } from 'lucide-react'
-import { Input } from '../ui/input'
 import { MobileMenuButton } from './Sidebar'
 import { Logo } from '../ui/logo'
+import { GlobalSearch } from './GlobalSearch'
 import { useAuth } from '../../context/AuthContext'
 
 export function Header({ onMenuClick, title = 'Dashboard' }) {
@@ -32,16 +31,9 @@ export function Header({ onMenuClick, title = 'Dashboard' }) {
             </div>
           </div>
 
-          {/* Center - Search (hidden on mobile) */}
-          <div className="hidden md:flex flex-1 max-w-lg mx-8">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Buscar pacientes, consultas..."
-                className="pl-10 w-full"
-              />
-            </div>
+          {/* Center - Global Search (hidden on mobile) */}
+          <div className="hidden md:flex flex-1 max-w-2xl mx-4 lg:mx-8">
+            <GlobalSearch className="w-full" />
           </div>
 
           {/* Right side */}

@@ -1,4 +1,4 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, Op } = require('sequelize');
 const { sequelize } = require('../sequelize');
 
 const defineModels = () => {
@@ -16,17 +16,26 @@ const defineModels = () => {
     id: { type: DataTypes.STRING, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
     nutritionistId: { type: DataTypes.STRING, allowNull: false },
     fullName: { type: DataTypes.STRING, allowNull: false },
-    email: { type: DataTypes.STRING, allowNull: true, unique: true },
+    email: { type: DataTypes.STRING, allowNull: true },
     phone: { type: DataTypes.STRING, allowNull: true },
     birthDate: { type: DataTypes.DATE, allowNull: true },
     sex: { type: DataTypes.STRING, allowNull: true },
     weight: { type: DataTypes.FLOAT, allowNull: true },
     height: { type: DataTypes.FLOAT, allowNull: true },
     goal: { type: DataTypes.STRING, allowNull: true },
-    allergies: { type: DataTypes.JSON, allowNull: false, defaultValue: [] },
+    allergies: { type: DataTypes.JSON, allowNull: true, defaultValue: [] },
     notes: { type: DataTypes.TEXT, allowNull: true },
   }, {
     tableName: 'Patient',
+    indexes: [
+      {
+        unique: true,
+        fields: ['email', 'nutritionistId'],
+        where: {
+          email: { [Op.ne]: null }
+        }
+      }
+    ]
   });
 
   const Appointment = sequelize.define('Appointment', {
