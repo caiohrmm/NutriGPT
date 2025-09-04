@@ -41,6 +41,107 @@
 
   ## 📊 Diagramas do Sistema
 
+  ### 🗄️ Diagrama MER (Modelo Entidade-Relacionamento)
+
+  ```mermaid
+  erDiagram
+      NUTRITIONIST {
+          int id PK
+          string fullName
+          string email UK
+          string password
+          string crn
+          datetime createdAt
+          datetime updatedAt
+      }
+      
+      PATIENT {
+          int id PK
+          string fullName
+          string email
+          string phone
+          date birthDate
+          string gender
+          string goal
+          text allergies
+          text notes
+          int nutritionistId FK
+          datetime createdAt
+          datetime updatedAt
+      }
+      
+      APPOINTMENT {
+          int id PK
+          datetime dateTime
+          string status
+          text notes
+          int patientId FK
+          int nutritionistId FK
+          datetime createdAt
+          datetime updatedAt
+      }
+      
+      MEASUREMENT {
+          int id PK
+          float weight
+          float height
+          float bodyFat
+          float muscleMass
+          float bmi
+          date date
+          text notes
+          int patientId FK
+          datetime createdAt
+          datetime updatedAt
+      }
+      
+      PLAN {
+          int id PK
+          string name
+          text description
+          int totalCalories
+          boolean isActive
+          boolean aiGenerated
+          int patientId FK
+          datetime createdAt
+          datetime updatedAt
+      }
+      
+      MEAL {
+          int id PK
+          string time
+          string title
+          json items
+          int calories
+          int planId FK
+          datetime createdAt
+          datetime updatedAt
+      }
+      
+      MACROS {
+          int id PK
+          int protein
+          int carbs
+          int fats
+          int mealId FK
+          datetime createdAt
+          datetime updatedAt
+      }
+      
+      %% Relacionamentos
+      NUTRITIONIST ||--o{ PATIENT : "1:N"
+      NUTRITIONIST ||--o{ APPOINTMENT : "1:N"
+      PATIENT ||--o{ APPOINTMENT : "1:N"
+      PATIENT ||--o{ MEASUREMENT : "1:N"
+      PATIENT ||--o{ PLAN : "1:N"
+      PLAN ||--o{ MEAL : "1:N"
+      MEAL ||--|| MACROS : "1:1"
+      
+      %% Índices e Constraints
+      PATIENT ||--|| NUTRITIONIST : "email unique per nutritionist"
+      PLAN ||--|| PATIENT : "only one active plan per patient"
+  ```
+
   ### 📋 Diagrama de Classes
 
   ```mermaid
@@ -145,13 +246,13 @@
       }
       
       %% Relacionamentos
-      Nutritionist ||--o{ Patient : manages
-      Nutritionist ||--o{ Appointment : schedules
-      Patient ||--o{ Appointment : has
-      Patient ||--o{ Measurement : has
-      Patient ||--o{ Plan : has
-      Plan ||--o{ Meal : contains
-      Meal ||--|| Macros : has
+      Nutritionist "1" --> "*" Patient : manages
+      Nutritionist "1" --> "*" Appointment : schedules
+      Patient "1" --> "*" Appointment : attends
+      Patient "1" --> "*" Measurement : has
+      Patient "1" --> "*" Plan : follows
+      Plan "1" --> "*" Meal : contains
+      Meal "1" --> "1" Macros : has
   ```
 
   ### 🏗️ Diagrama de Arquitetura
@@ -425,6 +526,7 @@
   ## 📚 Documentação Adicional
 
   - 📖 **[Documentação Técnica Completa](./documentacao.md)**
+  - 🗄️ **[Diagrama MER - Banco de Dados](./diagramamer.mmd)**
   - 🏗️ **[Diagrama de Classes](./diagramadeclasses.mmd)**
   - 🔄 **[Diagrama de Arquitetura](./diagramadearquitetura.mmd)**
   - 👤 **[Diagrama de Casos de Uso](./diagramacasosdeuso.mmd)**
