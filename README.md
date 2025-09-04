@@ -14,28 +14,110 @@
 
   ---
 
-  ## 🛠️ Stack Utilizada
+  ## 🛠️ Tecnologias
 
-  - **Node.js**: `>=18`
-  - **Linguagem**: JavaScript
-  - **Framework**: Express
-  - **ORM**: Sequelize
-  - **Banco de Dados**: MySQL
-  - **Autenticação**: JWT (Access + Refresh) + bcrypt
-  - **Validação de dados**: Zod
-  - **Armazenamento de arquivos**: Local / S3 (MinIO)
-  - **Documentação da API**: Gemini (YAML) + Postman Collection
+### **Backend**
+- **Node.js** `>=18` - Runtime JavaScript
+- **Express.js** `4.19.2` - Framework web
+- **Sequelize** `6.37.3` - ORM para banco de dados
+- **MySQL2** `3.11.0` - Driver MySQL
+- **JWT** `9.0.2` - Autenticação com tokens
+- **bcryptjs** `2.4.3` - Hash de senhas
+- **Zod** `3.23.8` - Validação de dados
+- **Google Generative AI** `0.20.0` - Integração com IA
+- **Express Rate Limit** `7.1.5` - Rate limiting
+- **Helmet** `7.1.0` - Segurança HTTP
+- **CORS** `2.8.5` - Controle de acesso
+- **Pino** `9.2.0` - Sistema de logs
+
+### **Frontend**
+- **React** `19.1.1` - Biblioteca de interface
+- **Vite** `7.1.2` - Build tool e dev server
+- **React Router DOM** `7.8.2` - Roteamento
+- **React Hook Form** `7.62.0` - Gerenciamento de formulários
+- **Zod** `4.1.5` - Validação do lado cliente
+- **Tailwind CSS** `3.4.17` - Framework CSS
+- **Recharts** `3.1.2` - Gráficos e visualizações
+- **Framer Motion** `12.23.12` - Animações
+- **Axios** `1.11.0` - Cliente HTTP
+- **Lucide React** `0.542.0` - Ícones
+- **Radix UI** - Componentes acessíveis
+- **TanStack Query** `5.85.9` - Gerenciamento de estado server
+
+### **Ferramentas de Desenvolvimento**
+- **Sequelize CLI** `6.6.2` - Migrações e seeders
+- **Nodemon** `3.1.4` - Hot reload no desenvolvimento
+- **ESLint** `9.33.0` - Linting de código
+- **PostCSS** `8.5.6` - Processamento CSS
+- **Autoprefixer** `10.4.21` - Prefixos CSS automáticos
 
   ---
 
-  ## 📌 Funcionalidades Principais
+  ## ✨ Funcionalidades Implementadas
 
-  - 📅 **Agendamento de consultas**
-  - 👨‍⚕️ **Gestão de pacientes** (dados pessoais, restrições, objetivos)
-  - 🥗 **Planos alimentares gerados por IA**, com edição manual pelo nutricionista
-  - 📂 **Armazenamento seguro de documentos e relatórios**
-  - 🔑 **Autenticação com JWT** (access + refresh)
-  - 🧩 **API bem estruturada com documentação YAML e coleção Postman**
+  ### 🔐 **Sistema de Autenticação**
+  - ✅ Login e registro de nutricionistas
+  - ✅ JWT com access e refresh tokens
+  - ✅ Middleware de autenticação
+  - ✅ Rate limiting para segurança
+  - ✅ Atualização de perfil (nome e senha)
+
+  ### 👥 **Gestão Completa de Pacientes**
+  - ✅ CRUD completo de pacientes
+  - ✅ Dados pessoais (nome, email, telefone, nascimento)
+  - ✅ Informações nutricionais (objetivo, alergias, observações)
+  - ✅ Cálculo automático de idade com meses
+  - ✅ Validação de dados (datas futuras, emails únicos por nutricionista)
+  - ✅ Busca e filtros por objetivo
+  - ✅ Prevenção de cadastro com email do próprio nutricionista
+
+  ### 📅 **Sistema de Agendamentos**
+  - ✅ CRUD completo de consultas
+  - ✅ Status de consultas (agendada, realizada, cancelada)
+  - ✅ Reagendamento de consultas
+  - ✅ Prevenção de reagendamento de consultas finalizadas
+  - ✅ Exclusão de consultas
+  - ✅ Histórico completo de atendimentos
+
+  ### 📏 **Controle de Medições e Métricas**
+  - ✅ Registro de peso, altura, gordura corporal, massa muscular
+  - ✅ Cálculo automático de IMC
+  - ✅ Histórico completo de medições
+  - ✅ Gráficos profissionais de evolução (Recharts)
+  - ✅ Validação de datas (não permite datas futuras)
+  - ✅ Visualização de dados da última medição
+
+  ### 🍽️ **Planos Alimentares Inteligentes**
+  - ✅ Criação manual de planos
+  - ✅ **Geração automática com IA (Google Gemini)**
+  - ✅ Consideração de alergias e restrições
+  - ✅ Cálculo de calorias e macronutrientes
+  - ✅ Sistema de planos ativos/inativos
+  - ✅ Edição e exclusão de planos
+  - ✅ Normalização inteligente de dados da IA
+
+  ### 📊 **Dashboard e Analytics**
+  - ✅ Métricas em tempo real
+  - ✅ Total de pacientes e consultas
+  - ✅ Consultas do dia
+  - ✅ Atividade recente
+  - ✅ Estatísticas do consultório
+  - ✅ Gráficos de evolução dos pacientes
+
+  ### 🔍 **Sistema de Busca Global**
+  - ✅ Busca unificada por pacientes e consultas
+  - ✅ Navegação rápida entre páginas
+  - ✅ Filtros inteligentes
+  - ✅ Integração com URLs para navegação direta
+
+  ### 🎨 **Interface e UX**
+  - ✅ Design moderno com Tailwind CSS
+  - ✅ Componentes reutilizáveis (Radix UI)
+  - ✅ Sistema de toasts personalizado
+  - ✅ Modais de confirmação
+  - ✅ Animações suaves (Framer Motion)
+  - ✅ Layout responsivo
+  - ✅ Sidebar fixa com scroll independente
 
   ---
 
@@ -410,6 +492,55 @@
       class L,R,P,S,O,PC,PL,PV,PE,PD,PF,CA,CL,CR,CC,CF,CD,MR,MH,ME,MD,MI,MG,PM,PA,PV2,PE2,PD2,PAT2,DV,DM,DA,DE,DG,SG,SF,SN usecase
   ```
 
+  ---
+
+  ## 📁 Estrutura do Projeto
+
+  ```
+  nutrigpt/
+  ├── 📁 src/                           # Backend
+  │   ├── 📁 middleware/               # Middlewares (auth, logger)
+  │   ├── 📁 models/                   # Modelos Sequelize
+  │   ├── 📁 routes/                   # Rotas da API
+  │   │   ├── auth.routes.js          # Autenticação
+  │   │   ├── patient.routes.js       # Pacientes
+  │   │   ├── appointment.routes.js   # Consultas
+  │   │   ├── measurement.routes.js   # Medições
+  │   │   └── plan.routes.js          # Planos alimentares
+  │   ├── 📁 utils/                    # Utilitários
+  │   │   ├── ai.js                   # Integração IA
+  │   │   ├── jwt.js                  # JWT helpers
+  │   │   ├── password.js             # Hash de senhas
+  │   │   └── logger.js               # Sistema de logs
+  │   ├── 📁 migrations/              # Migrações do banco
+  │   └── server.js                   # Servidor principal
+  ├── 📁 frontend/                     # Frontend React
+  │   ├── 📁 src/
+  │   │   ├── 📁 components/          # Componentes React
+  │   │   │   ├── 📁 appointments/    # Componentes de consultas
+  │   │   │   ├── 📁 layout/          # Layout (Header, Sidebar, etc)
+  │   │   │   ├── 📁 patients/        # Componentes de pacientes
+  │   │   │   └── 📁 ui/              # Componentes de UI base
+  │   │   ├── 📁 pages/               # Páginas da aplicação
+  │   │   ├── 📁 hooks/               # Hooks customizados
+  │   │   ├── 📁 utils/               # Utilitários (dateUtils, etc)
+  │   │   ├── 📁 lib/                 # API client, configurações
+  │   │   ├── 📁 context/             # Contexts (AuthContext)
+  │   │   └── 📁 layouts/             # Layouts da aplicação
+  │   ├── index.html                  # HTML principal
+  │   └── vite.config.js              # Configuração Vite
+  ├── 📄 documentacao.md              # Documentação completa
+  ├── 📄 diagramamer.mmd              # Diagrama MER
+  ├── 📄 diagramadeclasses.mmd        # Diagrama de classes
+  ├── 📄 diagramadearquitetura.mmd    # Diagrama de arquitetura
+  ├── 📄 diagramacasosdeuso.mmd       # Diagrama de casos de uso
+  ├── 📄 package.json                 # Dependências backend
+  ├── 📄 sequelize.config.js          # Configuração Sequelize
+  └── 📄 .env                         # Variáveis de ambiente
+  ```
+
+  ---
+
   ## 📈 Roadmap (Próximas Features)
 
   ### ✅ **Concluído**
@@ -499,27 +630,92 @@
 
   ### **5. Execute o sistema**
 
-  **Modo desenvolvimento (ambos simultaneamente):**
+  **Backend (API):**
   ```bash
   npm run dev
   ```
 
-  **Ou execute separadamente:**
-
-  **Backend:**
+  **Frontend (Interface):**
   ```bash
-  npm run server
+  cd frontend
+  npm run dev
+  cd ..
   ```
 
-  **Frontend:**
+  **Ou em terminais separados:**
+
+  **Terminal 1 - Backend:**
   ```bash
-  npm run client
+  npm run dev
+  ```
+
+  **Terminal 2 - Frontend:**
+  ```bash
+  cd frontend && npm run dev
   ```
 
   ### **6. Acesse o sistema**
 
   - **Frontend:** http://localhost:5173
   - **Backend API:** http://localhost:3000
+
+  ---
+
+  ## 🚀 API Endpoints
+
+  ### **Autenticação**
+  ```
+  POST /api/auth/register     # Registro de nutricionista
+  POST /api/auth/login        # Login
+  POST /api/auth/refresh      # Renovar tokens
+  POST /api/auth/logout       # Logout
+  PUT  /api/auth/me           # Atualizar perfil
+  ```
+
+  ### **Pacientes**
+  ```
+  GET    /api/patients        # Listar pacientes
+  POST   /api/patients        # Criar paciente
+  GET    /api/patients/:id    # Obter paciente
+  PUT    /api/patients/:id    # Atualizar paciente
+  DELETE /api/patients/:id    # Excluir paciente
+  ```
+
+  ### **Consultas**
+  ```
+  GET    /api/appointments           # Listar consultas
+  POST   /api/appointments           # Criar consulta
+  GET    /api/appointments/:id       # Obter consulta
+  PUT    /api/appointments/:id       # Atualizar consulta
+  DELETE /api/appointments/:id       # Excluir consulta
+  ```
+
+  ### **Medições**
+  ```
+  GET    /api/measurements               # Listar medições
+  POST   /api/measurements               # Criar medição
+  GET    /api/measurements/:id           # Obter medição
+  PUT    /api/measurements/:id           # Atualizar medição
+  DELETE /api/measurements/:id           # Excluir medição
+  GET    /api/measurements/patient/:id   # Medições por paciente
+  ```
+
+  ### **Planos Alimentares**
+  ```
+  GET    /api/plans                    # Listar planos
+  POST   /api/plans                    # Criar plano
+  GET    /api/plans/:id                # Obter plano
+  PUT    /api/plans/:id                # Atualizar plano
+  DELETE /api/plans/:id                # Excluir plano
+  PATCH  /api/plans/:id/toggle-active  # Ativar/desativar plano
+  POST   /api/plans/generate           # Gerar plano com IA
+  GET    /api/plans/patient/:id        # Planos por paciente
+  ```
+
+  ### **Busca Global**
+  ```
+  GET    /api/search/global?q=termo    # Busca global no sistema
+  ```
 
   ---
 
@@ -560,19 +756,33 @@
 
   ---
 
-  ## 🔒 Segurança
+  ## 🔒 Segurança e Validações
 
-  ### **Implementado:**
-  - ✅ **JWT** com access e refresh tokens
-  - ✅ **bcrypt** para hash de senhas
-  - ✅ **Middleware** de autenticação em rotas protegidas
-  - ✅ **Rate limiting** para prevenir ataques
-  - ✅ **Validação** rigorosa de dados com Zod
-  - ✅ **CORS** configurado adequadamente
-  - ✅ **Sanitização** de entradas
+  ### **Autenticação e Autorização**
+  - ✅ **JWT duplo**: Access token (15min) + Refresh token (7 dias)
+  - ✅ **bcryptjs**: Hash seguro de senhas (salt rounds: 12)
+  - ✅ **Middleware de autenticação**: Proteção de rotas sensíveis
+  - ✅ **Rate limiting**: 100 requests por 15 minutos por IP
+  - ✅ **Helmet**: Headers de segurança HTTP
+  - ✅ **CORS**: Controle de origem configurado
 
-  ### **Boas Práticas:**
-  - ✅ Senhas com mínimo de 8 caracteres
-  - ✅ Tokens JWT com expiração
-  - ✅ Validação de datas (não permitir datas futuras)
-  - ✅ Controle de unicidade por nutricionista
+  ### **Validação de Dados**
+  - ✅ **Zod schemas**: Validação tanto no frontend quanto backend
+  - ✅ **Sanitização**: Prevenção de XSS e injection
+  - ✅ **Validação de datas**: Não permite datas futuras para nascimento/medições
+  - ✅ **Unicidade controlada**: Email único por nutricionista (não global)
+  - ✅ **Prevenção de autoregistro**: Nutricionista não pode cadastrar paciente com próprio email
+
+  ### **Logging e Monitoramento**
+  - ✅ **Pino logger**: Sistema de logs estruturado
+  - ✅ **Request logging**: Rastreamento de requisições
+  - ✅ **Error handling**: Tratamento centralizado de erros
+  - ✅ **Environment variables**: Configurações sensíveis protegidas
+
+  ### **Validações de Negócio**
+  - ✅ **Senhas**: Mínimo 8 caracteres obrigatório
+  - ✅ **Datas de nascimento**: Não podem ser futuras
+  - ✅ **Datas de medição**: Limitadas até hoje
+  - ✅ **Reagendamento**: Bloqueado para consultas finalizadas
+  - ✅ **Planos ativos**: Apenas um por paciente
+  - ✅ **Calorias e macros**: Valores mínimos e máximos definidos
