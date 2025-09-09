@@ -121,6 +121,163 @@
 
   ---
 
+  ## 📋 Requisitos do Sistema
+
+  ### 🎯 **Requisitos Funcionais (RF)**
+
+  #### **RF01 - Sistema de Autenticação**
+  - **RF01.1** - O sistema deve permitir o registro de nutricionistas com nome, email e senha
+  - **RF01.2** - O sistema deve validar senhas com mínimo de 8 caracteres
+  - **RF01.3** - O sistema deve autenticar usuários com email e senha
+  - **RF01.4** - O sistema deve gerar tokens JWT (access + refresh) para sessões
+  - **RF01.5** - O sistema deve permitir logout seguro invalidando tokens
+  - **RF01.6** - O sistema deve permitir atualização de perfil (nome e senha)
+  - **RF01.7** - O sistema deve validar senha atual antes de alteração
+
+  #### **RF02 - Gestão de Pacientes**
+  - **RF02.1** - O sistema deve permitir cadastro de pacientes com dados pessoais completos
+  - **RF02.2** - O sistema deve validar que email do paciente seja único por nutricionista
+  - **RF02.3** - O sistema deve impedir cadastro de paciente com email do próprio nutricionista
+  - **RF02.4** - O sistema deve calcular idade automaticamente incluindo meses
+  - **RF02.5** - O sistema deve validar que data de nascimento não seja futura
+  - **RF02.6** - O sistema deve permitir edição de todos os dados do paciente
+  - **RF02.7** - O sistema deve permitir exclusão de pacientes
+  - **RF02.8** - O sistema deve listar pacientes com paginação e filtros
+  - **RF02.9** - O sistema deve permitir busca por nome, email ou objetivo
+  - **RF02.10** - O sistema deve permitir cadastro de alergias e restrições alimentares
+  - **RF02.11** - O sistema deve permitir definição de objetivos nutricionais
+
+  #### **RF03 - Sistema de Agendamentos**
+  - **RF03.1** - O sistema deve permitir agendamento de consultas com data/hora
+  - **RF03.2** - O sistema deve associar consultas a pacientes específicos
+  - **RF03.3** - O sistema deve permitir definição de status (agendada, realizada, cancelada)
+  - **RF03.4** - O sistema deve permitir reagendamento de consultas não finalizadas
+  - **RF03.5** - O sistema deve impedir reagendamento de consultas realizadas
+  - **RF03.6** - O sistema deve permitir exclusão de consultas
+  - **RF03.7** - O sistema deve listar consultas com filtros por data e status
+  - **RF03.8** - O sistema deve permitir adição de observações pós-consulta
+  - **RF03.9** - O sistema deve exibir histórico completo de atendimentos
+
+  #### **RF04 - Controle de Medições**
+  - **RF04.1** - O sistema deve permitir registro de medições corporais (peso, altura, etc.)
+  - **RF04.2** - O sistema deve calcular IMC automaticamente
+  - **RF04.3** - O sistema deve validar que data da medição não seja futura
+  - **RF04.4** - O sistema deve manter histórico cronológico de medições
+  - **RF04.5** - O sistema deve permitir edição e exclusão de medições
+  - **RF04.6** - O sistema deve exibir gráficos de evolução das medições
+  - **RF04.7** - O sistema deve identificar automaticamente a última medição
+  - **RF04.8** - O sistema deve permitir registro de circunferências corporais
+  - **RF04.9** - O sistema deve permitir registro de percentual de gordura
+
+  #### **RF05 - Planos Alimentares Inteligentes**
+  - **RF05.1** - O sistema deve permitir criação manual de planos alimentares
+  - **RF05.2** - O sistema deve integrar IA (Google Gemini) para geração automática
+  - **RF05.3** - O sistema deve considerar alergias e restrições na geração por IA
+  - **RF05.4** - O sistema deve calcular calorias e macronutrientes automaticamente
+  - **RF05.5** - O sistema deve permitir apenas um plano ativo por paciente
+  - **RF05.6** - O sistema deve permitir ativação/desativação de planos
+  - **RF05.7** - O sistema deve permitir edição completa de planos gerados
+  - **RF05.8** - O sistema deve permitir exclusão de planos
+  - **RF05.9** - O sistema deve normalizar dados da IA para formato consistente
+  - **RF05.10** - O sistema deve ter fallback quando IA não estiver disponível
+
+  #### **RF06 - Dashboard e Analytics**
+  - **RF06.1** - O sistema deve exibir métricas em tempo real no dashboard
+  - **RF06.2** - O sistema deve contar total de pacientes por nutricionista
+  - **RF06.3** - O sistema deve exibir consultas do dia atual
+  - **RF06.4** - O sistema deve mostrar atividade recente do sistema
+  - **RF06.5** - O sistema deve listar próximas consultas agendadas
+  - **RF06.6** - O sistema deve contar total de planos alimentares criados
+  - **RF06.7** - O sistema deve exibir estatísticas de uso do consultório
+
+  #### **RF07 - Sistema de Busca Global**
+  - **RF07.1** - O sistema deve permitir busca unificada por pacientes e consultas
+  - **RF07.2** - O sistema deve implementar busca com debounce (300ms)
+  - **RF07.3** - O sistema deve categorizar resultados de busca
+  - **RF07.4** - O sistema deve permitir navegação direta aos resultados
+  - **RF07.5** - O sistema deve limitar resultados para performance
+  - **RF07.6** - O sistema deve buscar por múltiplos campos simultaneamente
+
+  #### **RF08 - Interface e Experiência do Usuário**
+  - **RF08.1** - O sistema deve ser responsivo para desktop e mobile
+  - **RF08.2** - O sistema deve implementar sistema de notificações (toasts)
+  - **RF08.3** - O sistema deve implementar modais de confirmação
+  - **RF08.4** - O sistema deve ter animações suaves entre transições
+  - **RF08.5** - O sistema deve manter sidebar fixa em desktop
+  - **RF08.6** - O sistema deve implementar componentes acessíveis
+  - **RF08.7** - O sistema deve validar formulários em tempo real
+  - **RF08.8** - O sistema deve mascarar campos de entrada (telefone, etc.)
+
+  ### ⚙️ **Requisitos Não Funcionais (RNF)**
+
+  #### **RNF01 - Segurança**
+  - **RNF01.1** - Senhas devem ser criptografadas com bcrypt (salt rounds: 12)
+  - **RNF01.2** - Tokens JWT devem ter expiração (access: 15min, refresh: 7 dias)
+  - **RNF01.3** - Sistema deve implementar rate limiting (200 req/15min por IP)
+  - **RNF01.4** - Headers de segurança devem ser configurados (Helmet)
+  - **RNF01.5** - CORS deve ser configurado adequadamente
+  - **RNF01.6** - Dados sensíveis devem ser validados e sanitizados
+  - **RNF01.7** - Logs de sistema devem ser estruturados e seguros
+  - **RNF01.8** - Variáveis de ambiente devem ser protegidas
+
+  #### **RNF02 - Performance**
+  - **RNF02.1** - Listagens devem implementar paginação
+  - **RNF02.2** - Buscas devem ter debounce para evitar requisições excessivas
+  - **RNF02.3** - Componentes pesados devem usar lazy loading
+  - **RNF02.4** - Cálculos complexos devem ser memoizados
+  - **RNF02.5** - Banco de dados deve ter índices otimizados
+  - **RNF02.6** - Respostas da API devem ser comprimidas
+  - **RNF02.7** - Frontend deve usar build otimizado (Vite)
+
+  #### **RNF03 - Disponibilidade**
+  - **RNF03.1** - Sistema deve ter endpoint de health check
+  - **RNF03.2** - Erros devem ser tratados graciosamente
+  - **RNF03.3** - Sistema deve ter fallbacks para serviços externos
+  - **RNF03.4** - Banco de dados deve ter connection pooling
+  - **RNF03.5** - Sistema deve ser tolerante a falhas da IA
+
+  #### **RNF04 - Usabilidade**
+  - **RNF04.1** - Interface deve ser intuitiva e moderna
+  - **RNF04.2** - Sistema deve fornecer feedback visual imediato
+  - **RNF04.3** - Formulários devem ter validação em tempo real
+  - **RNF04.4** - Sistema deve ser acessível (WCAG guidelines)
+  - **RNF04.5** - Navegação deve ser consistente em todas as páginas
+  - **RNF04.6** - Sistema deve funcionar offline para operações básicas
+
+  #### **RNF05 - Escalabilidade**
+  - **RNF05.1** - Arquitetura deve suportar múltiplos nutricionistas
+  - **RNF05.2** - Banco de dados deve suportar crescimento horizontal
+  - **RNF05.3** - API deve ser stateless para balanceamento de carga
+  - **RNF05.4** - Sistema deve suportar cache distribuído
+
+  #### **RNF06 - Manutenibilidade**
+  - **RNF06.1** - Código deve seguir padrões de clean code
+  - **RNF06.2** - Sistema deve ter cobertura de testes adequada
+  - **RNF06.3** - Migrações de banco devem ser versionadas
+  - **RNF06.4** - Logs devem ser estruturados para análise
+  - **RNF06.5** - Documentação deve ser mantida atualizada
+
+  #### **RNF07 - Compatibilidade**
+  - **RNF07.1** - Sistema deve funcionar em navegadores modernos
+  - **RNF07.2** - API deve seguir padrões REST
+  - **RNF07.3** - Frontend deve ser compatível com dispositivos móveis
+  - **RNF07.4** - Sistema deve suportar diferentes resoluções de tela
+
+  #### **RNF08 - Integração**
+  - **RNF08.1** - Integração com IA deve ter timeout configurado
+  - **RNF08.2** - APIs externas devem ter circuit breaker
+  - **RNF08.3** - Sistema deve validar dados de APIs externas
+  - **RNF08.4** - Integrações devem ter retry automático
+
+  #### **RNF09 - Limites e Capacidade**
+  - **RNF09.1** - Upload de arquivos limitado a 1MB
+  - **RNF09.2** - Máximo 5000 calorias por plano alimentar
+  - **RNF09.3** - Máximo 50 pacientes por página de listagem
+  - **RNF09.4** - Busca global limitada a 10 resultados por categoria
+  - **RNF09.5** - Sessões JWT com renovação automática
+
+  ---
+
   ## 📊 Diagramas do Sistema
 
   ### 🗄️ Diagrama MER (Modelo Entidade-Relacionamento)
