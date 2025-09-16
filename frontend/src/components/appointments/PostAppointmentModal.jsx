@@ -28,6 +28,11 @@ export function PostAppointmentModal({
   const handleMeasurementSuccess = () => {
     setIsMeasurementModalOpen(false)
     onAddMeasurement?.()
+    
+    // Auto-close the post-appointment modal after adding measurement
+    setTimeout(() => {
+      handleFinish()
+    }, 1500) // Wait 1.5s to show success feedback, then close
   }
 
   const handleFinish = () => {

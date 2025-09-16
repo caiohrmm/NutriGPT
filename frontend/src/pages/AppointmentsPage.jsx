@@ -71,6 +71,37 @@ export function AppointmentsPage() {
     }
   }, [searchParams])
 
+  // Auto-update expired appointments
+  const autoUpdateExpiredAppointments = async (appointments) => {
+    const now = new Date()
+    const updatesNeeded = []
+
+    for (const appointment of appointments) {
+      const endTime = new Date(appointment.endAt)
+      
+      // If appointment end time has passed and it's still scheduled, mark as done
+      if (appointment.status === 'scheduled' && endTime < now) {
+        const bufferTime = 30 * 60 * 1000 // 30 minutes buffer
+        if (now - endTime > bufferTime) {
+          updatesNeeded.push(appointment.id)
+        }
+      }
+    }
+
+    if (updatesNeeded.length > 0) {
+      try {
+        await Promise.all(
+          updatesNeeded.map(id => 
+            appointmentAPI.update(id, { status: 'done' })
+          )
+        )
+        console.log(`✅ Auto-updated ${updatesNeeded.length} expired appointments`)
+      } catch (error) {
+        console.error('❌ Error auto-updating appointments:', error)
+      }
+    }
+  }
+
   const loadAppointments = async () => {
     setLoading(true)
     try {
@@ -82,7 +113,12 @@ export function AppointmentsPage() {
       }
       
       const response = await appointmentAPI.list(params)
-      setAppointments(response.data || [])
+      const appointments = response.data || []
+      
+      // Auto-update expired appointments
+      await autoUpdateExpiredAppointments(appointments)
+      
+      setAppointments(appointments)
       setTotal(response.meta?.total || 0)
       setTotalPages(response.meta?.totalPages || 1)
     } catch (error) {

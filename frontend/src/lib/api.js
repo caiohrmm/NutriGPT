@@ -1,6 +1,22 @@
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+// Detecta automaticamente a URL da API baseada no hostname atual
+const getApiBaseUrl = () => {
+  const hostname = window.location.hostname;
+  
+  // Se estiver acessando via IP da rede, usa o mesmo IP para a API
+  if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+    return `http://${hostname}:3000/api`;
+  }
+  
+  // Fallback para desenvolvimento local
+  return import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
+// Debug: mostra a URL da API no console
+console.log('🔗 API Base URL:', API_BASE_URL);
 
 // Create axios instance
 export const api = axios.create({

@@ -18,7 +18,24 @@ app.use(helmet());
 app.use(cors({
   origin: (origin, cb) => {
     const allowlist = (process.env.CORS_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean);
-    if (!origin || allowlist.length === 0 || allowlist.includes(origin)) return cb(null, true);
+    
+    // Em desenvolvimento, permite qualquer origem se CORS_ORIGINS estiver vazio
+    // ou adiciona IPs da rede local automaticamente
+    if (process.env.NODE_ENV === 'development' && allowlist.length === 0) {
+      return cb(null, true);
+    }
+    
+    // Lista de IPs permitidos para desenvolvimento local
+    const developmentOrigins = [
+      'http://localhost:5173',
+      'http://127.0.0.1:5173',
+      'http://26.192.192.120:5173',
+      'http://26.38.198.144:5173'
+    ];
+    
+    const allAllowed = [...allowlist, ...developmentOrigins];
+    
+    if (!origin || allAllowed.includes(origin)) return cb(null, true);
     return cb(new Error('CORS not allowed'), false);
   },
   credentials: true,

@@ -24,6 +24,47 @@ export function DashboardPage() {
     loadDashboardData()
   }, [])
 
+  // Auto-update appointment statuses based on business logic
+  const autoUpdateAppointmentStatuses = async (appointments) => {
+    const now = new Date()
+    const updatesNeeded = []
+
+    for (const appointment of appointments) {
+      const endTime = new Date(appointment.endAt)
+      
+      // If appointment end time has passed and it's still scheduled, 
+      // it should be marked as done automatically
+      if (appointment.status === 'scheduled' && endTime < now) {
+        // Only auto-complete if it ended more than 30 minutes ago
+        // to give some buffer time
+        const bufferTime = 30 * 60 * 1000 // 30 minutes in milliseconds
+        if (now - endTime > bufferTime) {
+          updatesNeeded.push({
+            id: appointment.id,
+            status: 'done'
+          })
+        }
+      }
+    }
+
+    // Update appointments that need status change
+    if (updatesNeeded.length > 0) {
+      console.log(`🔄 Auto-updating ${updatesNeeded.length} appointment(s) to 'done' status`)
+      
+      try {
+        // Update appointments in parallel
+        await Promise.all(
+          updatesNeeded.map(update => 
+            appointmentAPI.update(update.id, { status: update.status })
+          )
+        )
+        console.log('✅ Appointment statuses updated successfully')
+      } catch (error) {
+        console.error('❌ Error auto-updating appointment statuses:', error)
+      }
+    }
+  }
+
   const loadDashboardData = async () => {
     try {
       setLoading(true)
@@ -41,10 +82,13 @@ export function DashboardPage() {
       const patients = patientsResponse.data || []
       const appointments = appointmentsResponse.data || []
 
-      // Filter today's appointments
+      // Auto-update appointment status logic
+      await autoUpdateAppointmentStatuses(appointments)
+
+      // Filter today's appointments (only count scheduled and done for today's count)
       const appointmentsToday = appointments.filter(apt => {
         const aptDate = new Date(apt.startAt)
-        return aptDate >= todayStart && aptDate <= todayEnd
+        return aptDate >= todayStart && aptDate <= todayEnd && apt.status !== 'canceled'
       })
 
       // Get upcoming appointments (next 5)

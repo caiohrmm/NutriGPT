@@ -22,9 +22,9 @@ async function start() {
 
     await sequelize.authenticate();
     // Do not sync here; use migrations
-    app.listen(port, () => {
+    app.listen(port, '0.0.0.0', () => {
       // eslint-disable-next-line no-console
-      console.log(`NutriGPT API listening on port ${port}`);
+      console.log(`NutriGPT API listening on port ${port} (all interfaces)`);
     });
   } catch (err) {
     // eslint-disable-next-line no-console

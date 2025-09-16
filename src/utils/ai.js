@@ -30,21 +30,32 @@ async function generatePlanSuggestion({ patient, preferences }) {
   }
 
   try {
-    console.log('Using AI API key (first 10 chars):', apiKey.substring(0, 10) + '...');
-    console.log('AI prompt:', prompt);
+    console.log('🤖 Using AI API key (first 10 chars):', apiKey.substring(0, 10) + '...');
+    console.log('🎯 AI prompt length:', prompt.length);
     
     // Lazy require to avoid hard dependency if not installed
     // eslint-disable-next-line global-require, import/no-extraneous-dependencies
     const { GoogleGenerativeAI } = require('@google/generative-ai');
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ 
+      model: 'gemini-1.5-flash',
+      generationConfig: {
+        temperature: 0.7,
+        topK: 1,
+        topP: 1,
+        maxOutputTokens: 2048,
+      },
+    });
+    
+    console.log('🔄 Generating AI content...');
     const result = await model.generateContent(prompt);
     const text = result?.response?.text?.() || '';
 
-    console.log('AI response text:', text);
+    console.log('✅ AI response received, length:', text.length);
+    console.log('📝 AI response preview:', text.substring(0, 200) + '...');
     
     const parsed = safeParseJson(text);
-    console.log('Parsed AI response:', parsed);
+    console.log('🔍 Parsed AI response success:', !!parsed);
     
     if (parsed && parsed.meals && parsed.macros) {
       const normalized = normalizePlan(parsed);
